@@ -1,0 +1,180 @@
+$primary: #4285f4;
+$error: #d32f2f;
+$border: #ccc;
+
+.SignUp {
+  display: flex;
+  width: 75%;
+  overflow: hidden;
+  border-radius: 12px;
+  
+.SignupLeft {
+  background: linear-gradient(to bottom,#4285f4, #3a4a84);
+  color: white;
+  padding: 5vh;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 30px;
+
+  .infoBlock {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    svg {
+      font-size: 24px;
+      background-color: white;
+      color: #2b6eda;
+      padding: 8px;
+      border-radius: 50%;
+      flex-shrink: 0; /* Prevent icon from shrinking */
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 4px 0 0 0;
+      font-size: 14px;
+    }
+  }
+}
+
+.formContainer {
+  width: 50%;
+  background: #f9f9f9;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow-y: auto;
+  max-height: 100vh;
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // IE
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+
+    img {
+      width: 50px;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #000;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .inputGroup {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .inputWrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid black;
+      border-radius: 6px;
+      padding: 0 10px;
+      background: white;
+
+      svg {
+        color: #888;
+        font-size: 16px;
+        margin-right: 8px;
+      }
+
+      input {
+        padding: 12px 0;
+        border: none;
+        outline: none;
+        width: 100%;
+        font-size: 14px;
+
+        &:-webkit-autofill,
+          &:-webkit-autofill:hover,
+          &:-webkit-autofill:focus,
+          &:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px white inset !important;
+            -webkit-text-fill-color: black !important;
+            transition: background-color 5000s ease-in-out 0s;
+          }
+      }
+
+      input:invalid {
+        border: none;
+        outline: 1px solid $error;
+      }
+    }
+
+    .error {
+      color: $error;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .errorBorder {
+      border: 1px solid $error;
+    }
+  }
+
+  button {
+    background-color: $primary;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: #0041aa;
+    }
+  }
+
+  .signupLink {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    p {
+      font-size: 14px;
+      color: #333;
+    }
+
+    a {
+      color: #4285f4;
+      font-weight: bold;
+      text-decoration: none;
+      margin-left: 5px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+}
