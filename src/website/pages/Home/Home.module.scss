@@ -1,0 +1,502 @@
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeInUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes growLine {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.Home {
+  .HeaderTitle {
+    text-align: center;
+    margin-top: 40px;
+    padding: 0 1rem;
+
+    h1 {
+      font-size: 3.6vw;
+      font-weight: 600;
+      line-height: 1.2;
+      margin: 0 auto;
+      max-width: 900px;
+      color: #222;
+      position: relative;
+      animation: fadeSlideUp 1s ease forwards;
+
+      background: linear-gradient(90deg, #407bff, #2e5ed7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      font-size: 1.3vw;
+      font-weight: 300;
+      color: rgba(73, 93, 122, 0.8);
+      margin-top: 1.5rem;
+      animation: fadeSlideUp 1.5s ease forwards;
+      max-width: 750px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    @media (max-width: 1024px) {
+      h1 {
+        font-size: 2.6rem;
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+    }
+
+    // Mobile (≤767px)
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+        padding: 0 1rem;
+      }
+    }
+  }
+
+  .Search {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 20px 0;
+    position: relative;
+
+    .SearchInputWrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .SearchIcon {
+        position: absolute;
+        left: 15px;
+        color: #777;
+        font-size: 1rem;
+        pointer-events: none;
+      }
+
+      .SearchInput {
+        padding: 15px 20px 15px 40px;
+        border-radius: 25px;
+        border: 1px solid #aaa;
+        width: 25vw;
+        font-size: 1rem;
+        outline: none;
+        z-index: 0;
+      }
+
+      .Suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin-top: 5px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+        list-style: none;
+        padding: 0;
+
+        li {
+          padding: 10px 15px;
+          cursor: pointer;
+          transition: background 0.2s;
+
+          &:hover {
+            background-color: #f5f5f5;
+          }
+        }
+      }
+    }
+
+    .SearchButton {
+      background-color: #407bff;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background-color: #2e5ed7;
+      }
+    }
+  }
+
+  .Filter {
+    display: flex;
+    justify-content: center;
+
+    .FilterList {
+      background-color: #407bff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 20px;
+      margin: 10px 0;
+      color: #fff;
+      width: 65%;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      flex-wrap: nowrap;
+
+      .FilterItem {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        width: 25%;
+        border-right: 1px rgba(255, 255, 255, 0.5) solid;
+
+        &:last-child {
+          border: none;
+        }
+
+        label {
+          font-size: 24px;
+          margin-bottom: 1.5vw;
+          color: #ffffff;
+        }
+
+        .SelectWrapper {
+          position: relative;
+          width: 70%;
+
+          select {
+            background-color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 0px 10px 0px;
+            font-size: 14px;
+            color: #000;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            appearance: none;
+
+            &:focus {
+              outline: none;
+              box-shadow: none;
+              border: none;
+            }
+
+            option {
+              max-height: 10px;
+            }
+          }
+
+          &::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #333;
+            pointer-events: none;
+          }
+        }
+      }
+    }
+  }
+
+  .JobVacanciesSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem 0;
+    padding: 0 16vw;
+    position: relative;
+
+    .JobVacanciesText {
+      font-size: clamp(1.2rem, 1.3vw, 2rem);
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #2c3e50;
+      letter-spacing: 1px;
+    }
+
+    .HorizontalLine {
+      flex-grow: 1;
+      height: 2px;
+      margin: 0 1.8vw;
+      background: linear-gradient(to right, #bbb, #999, #bbb);
+      border: none;
+      animation: growLine 1.2s ease-in-out;
+    }
+  }
+
+  .VacancyList {
+    width: 68%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    padding-bottom: 2rem;
+
+    .VacancyListItems {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 1.4rem 2.2rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(29, 3, 228, 0.35);
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 84, 255, 0.06),
+          transparent 70%
+        );
+        animation: floatingGlow 6s ease-in-out infinite;
+        z-index: 0;
+      }
+
+      .LogoInfo {
+        display: flex;
+        align-items: center;
+        gap: 1vw;
+        z-index: 1;
+
+        .VacancyLogo {
+          width: 65px;
+          height: 50px;
+          object-fit: contain;
+          transition: transform 0.3s ease;
+        }
+
+        .VacancyInfo {
+          display: flex;
+          flex-direction: column;
+          h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #0c2b6e;
+          }
+          p {
+            margin: 0;
+            font-size: 1rem;
+            color: #444;
+          }
+        }
+      }
+
+      .Applylink {
+        z-index: 1;
+        text-decoration: none;
+
+        .ApplyBtn {
+          padding: 0.8rem 1.8rem;
+          background: linear-gradient(135deg, #4c6fff, #2d49c9);
+          color: white;
+          border-radius: 14px;
+          font-size: 1.05rem;
+          font-weight: 500;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 6px 16px rgba(44, 90, 255, 0.3);
+
+          h4 {
+            margin: 0;
+          }
+
+          &:hover {
+            background: linear-gradient(135deg, #2d49c9, #4c6fff);
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(44, 90, 255, 0.4);
+          }
+        }
+      }
+    }
+  }
+
+  .Pagination {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+// media kodlari
+
+@media (max-width: 1024px) {
+  .Home {
+    .Search {
+      .SearchInputWrapper {
+        .SearchInput {
+          width: 50vw;
+        }
+      }
+    }
+
+    .Filter {
+      .FilterList {
+        flex-wrap: wrap;
+        width: 90%;
+        padding: 15px;
+
+        .FilterItem {
+          margin: 10px 0;
+          border: none;
+
+          label {
+            font-size: 18px;
+            margin-bottom: 10px;
+          }
+
+          .SelectWrapper {
+            width: 90%;
+
+            select {
+              font-size: 14px;
+              padding: 8px 12px;
+            }
+          }
+        }
+      }
+    }
+
+    .JobVacanciesSection {
+      .JobVacanciesText {
+        font-size: clamp(1.3rem, 2.3vw, 2.5rem);
+      }
+
+      .HorizontalLine {
+        margin: 0 1.2vw;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .Home {
+    .Filter {
+      .FilterList {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px;
+
+        .FilterItem {
+          width: 100%;
+          margin: 8px 0;
+          border: none;
+
+          label {
+            font-size: 16px;
+            text-align: left;
+            margin-left: 5%;
+          }
+
+          .SelectWrapper {
+            width: 90%;
+            margin: 0 auto;
+          }
+        }
+      }
+    }
+
+    .JobVacanciesSection {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 0 5vw;
+
+      .JobVacanciesText {
+        font-size: clamp(1.5rem, 5vw, 3rem);
+        margin-bottom: 10px;
+        text-align: left;
+      }
+
+      .HorizontalLine {
+        width: 100%;
+        height: 2px;
+        margin: 0;
+      }
+    }
+
+    .VacancyList {
+      width: 94%;
+
+      .VacancyListItems {
+        flex-direction: column;
+        padding: 20px;
+
+        .LogoInfo {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .VacancyInfo {
+          width: 100%;
+          text-align: center;
+          padding-left: 0;
+        }
+
+        .ApplyBtn {
+          font-size: 4vw;
+          padding: 2vw 9vw;
+          margin-top: 5vw;
+
+          &:hover {
+            transition: 0.4s all;
+            font-size: 3vw;
+          }
+        }
+      }
+    }
+  }
+}

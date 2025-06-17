@@ -1,0 +1,388 @@
+.Navbar {
+  background-color: #e6f0ff;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+
+  .NavbarContainer {
+    margin: 0 30px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    position: relative;
+
+    .Logo {
+      display: flex;
+      align-items: center;
+
+      img {
+        height: 6vw;
+        max-height: none;
+      }
+    }
+
+    .Checkbox {
+      display: none;
+    }
+
+    .Checkbtn {
+      font-size: 28px;
+      color: #003366;
+      display: none;
+      cursor: pointer;
+    }
+
+    .navLinks {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10vw;
+      list-style: none;
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 2vw;
+      }
+
+      li {
+        position: relative;
+
+        a,
+        span {
+          text-decoration: none;
+          transition: all 0.3s ease;
+          position: relative;
+          color: #333;
+          font-size: 1.2rem;
+          cursor: pointer;
+
+          &::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0077ff, #00c6ff);
+            bottom: -4px;
+            left: 0;
+            transition: width 0.4s ease;
+          }
+
+          &:hover {
+            color: #0077ff;
+          }
+
+          &:hover::after {
+            width: 100%;
+          }
+        }
+
+        // Active underline effect
+        .active {
+          color: #0077ff;
+
+          &::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #0077ff, #00c6ff);
+            bottom: -4px;
+            left: 0;
+          }
+        }
+
+        &.dropdown {
+          .dropdownBox {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            padding: 10px 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            width: 100%;
+
+            a {
+              display: block;
+              padding: 10px 20px;
+              font-size: 1.1vw;
+              color: #003366;
+
+              &:hover {
+                color: #4285f4;
+              }
+
+              &.active {
+                color: #0077ff;
+
+                &::after {
+                  content: "";
+                  position: absolute;
+                  width: 100%;
+                  height: 2px;
+                  background: linear-gradient(90deg, #0077ff, #00c6ff);
+                  bottom: -4px;
+                  left: 0;
+                }
+              }
+            }
+          }
+        }
+
+        &.open .dropdownBox {
+          display: block;
+          width: 16vw;
+        }
+      }
+    }
+
+    .languageItem {
+      margin-left: 1rem;
+
+      select {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background-color: #e6f0ff;
+        font-weight: 500;
+        cursor: pointer;
+      }
+    }
+
+    .NavButtons {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .Signin,
+      .Signup {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        padding: 8px 14px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+
+        &.active {
+          border: 2px solid #0077ff;
+        }
+      }
+
+      .Signin {
+        background-color: transparent;
+        border: 1px solid #4285f4;
+        color: #4285f4;
+
+        &:hover {
+          background-color: #4285f4;
+          color: white;
+        }
+      }
+
+      .Signup {
+        background-color: transparent;
+        border: 1px solid #4285f4;
+        color: #4285f4;
+
+        &:hover {
+          background-color: #4285f4;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .Navbar {
+    .NavbarContainer {
+      margin: 0px 25px 0px 10px;
+
+      .Checkbtn {
+        display: block;
+        position: absolute;
+        top: 15px;
+        right: -10px;
+        z-index: 1000;
+        font-size: 4vw;
+      }
+
+      .navLinks {
+        flex-direction: column;
+        align-items: flex-start;
+        background-color: white;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 50%;
+        z-index: 1000;
+        transition: all 0.3s ease-in-out;
+        padding: 6vw 4vw;
+        gap: 1vw;
+        height: 100vh;
+        box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.6);
+        justify-content: flex-start;
+        .nav {
+          flex-direction: column;
+          align-items: flex-start;
+          .dropdown {
+            .dropdownBox {
+              width: 24vh;
+
+              a {
+                font-size: 3vw;
+                padding: 8px 8px;
+              }
+            }
+          }
+
+          li {
+            margin: 1vw 0;
+            text-align: left;
+
+            a,
+            span {
+              cursor: pointer;
+            }
+          }
+        }
+      }
+
+      .show {
+        right: 0;
+      }
+
+      .Logo {
+        justify-content: center;
+
+        img {
+          height: 10vh;
+        }
+      }
+
+      .languageItem {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin: 15px 0;
+
+        select {
+          font-size: 1rem;
+        }
+      }
+
+      .NavButtons {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 15px;
+
+        .Signin,
+        .Signup {
+          justify-content: center;
+        }
+      }
+
+      .closeBtn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 28px;
+        background: none;
+        border: none;
+        color: #003366;
+        cursor: pointer;
+        z-index: 1000;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .Navbar {
+    .NavbarContainer {
+      margin: 0 15px;
+
+      .Checkbtn {
+        display: block;
+        position: absolute;
+        top: 12px;
+        right: 0;
+        font-size: 36px;
+        z-index: 1000;
+      }
+
+      .navLinks {
+        right: -100%;
+        padding: 10vw 6vw;
+        gap: 3vw;
+
+        .nav {
+          gap: 3vw;
+
+          .dropdown {
+            .dropdownBox {
+              width: 30vh;
+
+              a {
+                font-size: 3.5vw;
+                padding: 10px 12px;
+              }
+            }
+          }
+
+          li {
+            a,
+            span {
+              font-size: 1.1rem;
+            }
+          }
+        }
+      }
+
+      .Logo {
+        img {
+          height: 8vh;
+        }
+      }
+
+      .languageItem {
+        margin: 10px 0;
+
+        select {
+          font-size: 0.95rem;
+          padding: 6px 8px;
+        }
+      }
+
+      .NavButtons {
+        gap: 0.8rem;
+
+        .Signin,
+        .Signup {
+          font-size: 0.95rem;
+          padding: 7px 12px;
+        }
+      }
+
+      .closeBtn {
+        font-size: 32px;
+        top: 15px;
+        right: 15px;
+      }
+
+      .show {
+        right: 0;
+      }
+    }
+  }
+}

@@ -1,0 +1,220 @@
+@keyframes floatingGlow {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.05);
+  }
+}
+
+@keyframes borderShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.ThePower {
+  .searchHeader {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+
+    .searchInput,
+    .searchSelect {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.35);
+      padding: 1rem 1.5rem;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(14, 85, 216, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      width: 280px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: 0 10px 30px rgba(0, 70, 222, 0.414);
+      }
+
+      i {
+        color: #113a92;
+        margin-right: 0.8rem;
+        font-size: 1.2rem;
+      }
+
+      input,
+      select {
+        border: none;
+        outline: none;
+        width: 100%;
+        font-size: 1rem;
+        background: transparent;
+        color: #113a92;
+      }
+    }
+
+    .searchButton {
+      background: linear-gradient(135deg, #4c6fff, #2d49c9);
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      box-shadow: 0 10px 25px rgba(44, 90, 255, 0.4);
+      transition: all 0.35s ease;
+      border: none;
+      position: relative;
+      overflow: hidden;
+
+      i {
+        font-size: 1.2rem;
+      }
+
+      &:hover {
+        background: linear-gradient(135deg, #2d49c9, #4c6fff);
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 12px 30px rgba(44, 90, 255, 0.5);
+      }
+    }
+  }
+
+  .VacancyList {
+    width: 92%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    padding-bottom: 2rem;
+
+    .VacancyListItems {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 1.8rem 2.2rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px rgba(29, 3, 228, 0.35);
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(0, 84, 255, 0.06),
+          transparent 70%
+        );
+        animation: floatingGlow 6s ease-in-out infinite;
+        z-index: 0;
+      }
+
+      .LogoInfo {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        z-index: 1;
+
+        .VacancyLogo {
+          width: 65px;
+          height: 65px;
+          object-fit: contain;
+          transition: transform 0.3s ease;
+
+          &:hover {
+            transform: rotate(8deg) scale(1.12);
+          }
+        }
+
+        .VacancyInfo {
+          display: flex;
+          flex-direction: column;
+          h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #0c2b6e;
+          }
+          p {
+            margin: 0;
+            font-size: 1rem;
+            color: #444;
+          }
+        }
+      }
+
+      .Applylink {
+        z-index: 1;
+        text-decoration: none;
+
+        .ApplyBtn {
+          padding: 0.8rem 1.8rem;
+          background: linear-gradient(135deg, #4c6fff, #2d49c9);
+          color: white;
+          border-radius: 14px;
+          font-size: 1.05rem;
+          font-weight: 500;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 6px 16px rgba(44, 90, 255, 0.3);
+
+          h4 {
+            margin: 0;
+          }
+
+          &:hover {
+            background: linear-gradient(135deg, #2d49c9, #4c6fff);
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(44, 90, 255, 0.4);
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .searchHeader {
+      flex-direction: column;
+
+      .searchButton {
+        width: 280px;
+      }
+    }
+
+    .VacancyListItems {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.2rem;
+    }
+
+    .ApplyBtn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}

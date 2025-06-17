@@ -1,39 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
 
-
-*{
-    padding: 0;
-    margin: 0;
-    font-family: 'Montserrat', sans-serif;
+* {
+  padding: 0;
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
 }
 .App {
-  padding: 1.5vw 0;
   box-sizing: border-box;
   height: 100vh;
   display: flex;
   justify-content: center;
-  // background: linear-gradient(135deg, 
-  //   #d6e9fb 0%,
-  //   #7fb3e6 25%,
-  //   #a5ccef 50%,
-  //   #7fb3e6 75%,
-  //   #d6e9fb 100%
-  // );
 
-  background-color: #4158D0;
-  background-image: linear-gradient(160deg, #8a99e0 0%, #f6f6f5 50%, #9896e4 100%);
-  // animation: waveBackground 5s ease-in-out infinite;
-  // background-size: 100% 100%;
-
-  // @keyframes waveBackground {
-  //   0% {
-  //     background-position: 0% 50%;
-  //   }
-  //   50% {
-  //     background-position: 100% 50%;
-  //   }
-  //   100% {
-  //     background-position: 0% 50%;
-  //   }
-  // }
+  background-color: #4158d0;
+  background-image: linear-gradient(
+    160deg,
+    #8a99e0 0%,
+    #f6f6f5 50%,
+    #9896e4 100%
+  );
 }
