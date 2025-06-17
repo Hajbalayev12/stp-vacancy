@@ -10,15 +10,22 @@ const StyledPagination = styled(Pagination)(() => ({
   "& .MuiPaginationItem-root": {
     color: "#407bff",
     borderColor: "#407bff",
+    backgroundColor: "white",
+
+    "&:hover": {
+      backgroundColor: "#407bff",
+      color: "white",
+    },
   },
-  "& .Mui-selected": {
+  "& .MuiPaginationItem-root.Mui-selected": {
     backgroundColor: "#407bff",
-    color: "#fff",
+    color: "white",
     borderColor: "#407bff",
-  },
-  "& .MuiPaginationItem-root:hover": {
-    backgroundColor: "#407bff",
-    color: "#fff",
+
+    "&:hover": {
+      backgroundColor: "#407bff",
+      color: "white",
+    },
   },
 }));
 

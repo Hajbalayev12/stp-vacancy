@@ -1,6 +1,135 @@
 .Navbar {
-  height: 10vh;
-  width: 100%;
-  color: red;
-  background-color: green;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  // width: 97.6%;
+  background-color: #ffffff;
+  padding: 0 20px;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.07);
+  font-family: "Segoe UI", sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      img {
+        width: 60px;
+        height: 60px;
+      }
+
+      .logoText {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+        h1 {
+          font-size: 20px;
+          font-weight: 700;
+          color: #111;
+          margin: 0;
+        }
+        span {
+          font-size: 12px;
+          color: #999;
+        }
+      }
+    }
+
+    .burger {
+      font-size: 21px;
+      color: #555;
+      cursor: pointer;
+    }
+
+    .pageTitle {
+      font-size: 16px;
+      font-weight: 600;
+      color: #222;
+    }
+  }
+
+  .searchSection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    input {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      background-color: #f2f3f5;
+      width: 200px;
+      font-size: 14px;
+      color: #333;
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .searchIcon {
+      font-size: 16px;
+      color: #888;
+      margin-left: -28px;
+    }
+
+    .addBtn {
+      background-color: #dce7e7;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      color: #256c67;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #c4dede;
+      }
+    }
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    .flag {
+      width: 35px;
+      height: 28px;
+    }
+
+    .icon {
+      font-size: 18px;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .iconBadge {
+      position: relative;
+      font-size: 18px;
+      color: #444;
+      cursor: pointer;
+
+      .badge {
+        position: absolute;
+        top: -6px;
+        right: -10px;
+        background-color: #f44336;
+        color: white;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-weight: bold;
+      }
+    }
+  }
 }

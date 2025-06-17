@@ -1,6 +1,133 @@
-.Sidebar {
-  color: red;
-  background-color: blue;
-  height: 90vh;
-  width: 15%;
+.sidebar {
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #4a4a4a;
+  width: 250px;
+  height: 100%;
+  padding: 10px 10px 0px 10px;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", sans-serif;
+  overflow-y: auto;
+  flex-shrink: 0;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .menuItem {
+      margin-bottom: 8px;
+
+      .menuHeader {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+
+        &:hover {
+          background-color: #fff0ec;
+          color: #e34b1b;
+
+          .icon {
+            transform: scale(1.15);
+          }
+        }
+
+        .icon {
+          font-size: 18px;
+          margin-right: 12px;
+          transition: transform 0.3s ease;
+          width: 20px;
+        }
+
+        .label {
+          flex-grow: 1;
+          font-size: 15px;
+          font-weight: 500;
+        }
+
+        .badge {
+          background-color: #b35ed6;
+          color: #fff;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 2px 6px;
+          border-radius: 10px;
+        }
+
+        .arrow {
+          transition: transform 0.3s ease;
+          font-size: 12px;
+          margin-left: 8px;
+        }
+
+        .rotate {
+          transform: rotate(180deg);
+        }
+      }
+
+      .subMenu {
+        list-style: none;
+        padding-left: 32px;
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition: max-height 3s ease, opacity 0.2s ease 0.1s; /* opacity fades slightly delayed */
+
+        &.show {
+          max-height: 1000px; /* large enough */
+          opacity: 1;
+          transition: max-height 3s ease, opacity 0.1s ease 0.1s;
+        }
+
+        &.hide {
+          max-height: 0;
+          opacity: 0;
+          transition: max-height 0.5s ease, opacity 0.1s ease 0.5s;
+        }
+
+        .subMenuItem {
+          padding: 6px 0;
+          color: #6c757d;
+          font-size: 14px;
+          cursor: pointer;
+          transition: color 0.2s;
+
+          a {
+            text-decoration: none;
+            color: inherit;
+          }
+
+          &:hover {
+            color: #e34b1b;
+            font-weight: 500;
+
+            a {
+              color: inherit;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
