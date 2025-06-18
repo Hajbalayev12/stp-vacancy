@@ -10,9 +10,13 @@ export default function AdminLayout() {
 
   React.useEffect(() => {
     if (!token) {
-      navigate("/admin");
+      navigate("/admin/signin");
     }
   }, [token, navigate]);
+
+  if (!token) {
+    return null;
+  }
 
   return (
     <div className={styles.AdminLayout}>

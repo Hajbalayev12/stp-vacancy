@@ -23,7 +23,7 @@ const menuItems = [
     icon: <FaTachometerAlt />,
     label: "Dashboard",
     subItems: [
-      { label: "Jobs", path: "/admin/jobs" },
+      { label: "Home", path: "/admin/home" },
       { label: "Application", path: "/admin/applications" },
       { label: "Profile", path: "/admin/profile" },
       { label: "Statistics", path: "/admin/statistics" },
@@ -34,7 +34,7 @@ const menuItems = [
     icon: <LuBuilding2 />,
     label: "Companies",
     subItems: [
-      { label: "➕ Add Company", path: "/admin/addcompanies" },
+      { label: "➕ Add Company", path: "/admin/addcompany" },
       { label: "View Companies", path: "/admin/companies" },
     ],
   },
