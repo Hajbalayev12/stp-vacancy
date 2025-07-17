@@ -1,16 +1,4 @@
 .VacancyInfo {
-  background-color: #e6f0ff;
-  max-height: 100vh;
-  width: 97%;
-  box-sizing: border-box;
-  border-radius: 20px;
-  overflow-y: auto;
-  scrollbar-width: none;
-
-  .Companies::-webkit-scrollbar {
-    display: none;
-  }
-
   .content {
     display: flex;
     justify-content: space-between;

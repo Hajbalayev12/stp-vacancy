@@ -1,47 +1,126 @@
 .AddCompany {
-  padding: 30px;
+  padding: 40px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  // animation: fadeInUp 0.7s ease;
 
   h2 {
-    margin-bottom: 20px;
+    font-size: 30px;
+    text-align: center;
+    color: #004bb1;
+    margin-bottom: 35px;
+    position: relative;
   }
+}
 
-  .form {
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  label {
+    font-weight: 600;
+    font-size: 15px;
+    color: #222;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-
-    label {
-      font-weight: 500;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    gap: 6px;
 
     input,
     textarea {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 1px solid #e1e1e1;
+      border-radius: 12px;
+      background: #f9fbff;
+      transition: all 0.25s ease;
+
+      &:focus {
+        border-color: #0072ff;
+        box-shadow: 0 0 0 4px rgba(0, 114, 255, 0.15);
+        outline: none;
+        background: #ffffff;
+      }
     }
 
     textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 120px;
+    }
+  }
+
+  button {
+    margin-top: 10px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #0072ff;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    // box-shadow: 0 8px 24px rgba(0, 114, 255, 0.3);
+    transition: all 0.25s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      // box-shadow: 0 12px 32px rgba(0, 114, 255, 0.4);
+    }
+  }
+}
+
+// Logo input'a xüsusi görünüş
+input[type="file"] {
+  padding: 10px;
+  background: #f0f7ff;
+  border: 1px dashed #0072ff;
+  color: #0072ff;
+  border-radius: 12px;
+  cursor: pointer;
+
+  &::file-selector-button {
+    background: #0072ff;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    margin-right: 12px;
+    cursor: pointer;
+  }
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .AddCompany {
+    padding: 30px 20px;
+  }
+
+  .form {
+    label {
+      font-size: 14px;
+
+      input,
+      textarea {
+        font-size: 14px;
+      }
     }
 
     button {
-      padding: 10px 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #0056b3;
-      }
+      font-size: 15px;
     }
   }
 }

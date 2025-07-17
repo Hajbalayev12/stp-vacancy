@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEnvelope, FaUsers, FaClock, FaUserFriends } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import styles from "./ForgotPassword.module.scss";
@@ -6,6 +6,26 @@ import styles from "./ForgotPassword.module.scss";
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState(false);
+  const [companyName, setCompanyName] = useState(
+    "Sumqayıt Texnologiylar Parkı"
+  );
+
+  useEffect(() => {
+    // Fetch company name from API on page load
+    fetch("http://192.168.200.133:8081/api/companies")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Server error");
+        }
+        return res.text(); // because your API returns plain text (not JSON)
+      })
+      .then((data) => {
+        setCompanyName(data);
+      })
+      .catch((err) => {
+        console.error("API fetch failed:", err);
+      });
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,8 +42,9 @@ export default function ForgotPassword() {
       <div className={styles.ForgotLeft}>
         <div className={styles.logoWrapper}>
           <img src="src/website/assets/stpmmcwhite.png" alt="STP Logo" />
-          <span>Sumqayıt Texnologiylar Parkı</span>
+          <span>{companyName}</span>
         </div>
+
         <div className={styles.infoBlock}>
           <FaUsers />
           <div>

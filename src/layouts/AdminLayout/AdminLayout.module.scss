@@ -12,26 +12,6 @@
     min-height: 0; // prevents child overflow
     overflow: hidden;
 
-    // SIDEBAR
-    // .sidebar {
-    //   width: 250px;
-    //   height: 100%;
-    //   background-color: #fff;
-    //   padding: 20px 10px;
-    //   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
-    //   font-family: "Segoe UI", sans-serif;
-    //   color: #4a4a4a;
-    //   overflow-y: auto;
-    //   flex-shrink: 0;
-
-    //   scrollbar-width: none;
-    //   -ms-overflow-style: none;
-
-    //   &::-webkit-scrollbar {
-    //     display: none;
-    //   }
-    // }
-
     // CONTENT
     .content {
       flex: 1;

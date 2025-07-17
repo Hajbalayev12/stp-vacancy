@@ -1,41 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Sidebar.module.scss";
-import {
-  FaTachometerAlt,
-  FaUser,
-  FaGlobe,
-  FaCogs,
-  FaTh,
-  FaChartLine,
-  FaStar,
-  FaHeart,
-  FaWrench,
-  FaWpforms,
-  FaTable,
-  FaCopy,
-  FaChevronDown,
-} from "react-icons/fa";
+import { FaTachometerAlt, FaUser, FaChevronDown } from "react-icons/fa";
 import { LuBuilding2 } from "react-icons/lu";
 
 const menuItems = [
   {
     icon: <FaTachometerAlt />,
     label: "Dashboard",
-    subItems: [
-      { label: "Home", path: "/admin/home" },
-      { label: "Application", path: "/admin/applications" },
-      { label: "Profile", path: "/admin/profile" },
-      { label: "Statistics", path: "/admin/statistics" },
-      { label: "Companies", path: "/admin/companies" },
-    ],
+    subItems: [{ label: "Home", path: "/admin/home" }],
   },
   {
     icon: <LuBuilding2 />,
     label: "Companies",
     subItems: [
       { label: "➕ Add Company", path: "/admin/addcompany" },
-      { label: "View Companies", path: "/admin/companies" },
+      { label: "View Companies", path: "/admin/viewcompanies" },
     ],
   },
   {
@@ -43,20 +23,9 @@ const menuItems = [
     label: "Vacancies",
     subItems: [
       { label: "➕ Add Vacancy", path: "/admin/addvacancy" },
-      { label: "View Vacancies", path: "/admin/vacancies" },
+      { label: "View Vacancies", path: "/admin/viewvacancies" },
     ],
   },
-  { icon: <FaGlobe />, label: "Account", badge: "New" },
-  { icon: <FaGlobe />, label: "AİKit", badge: "New" },
-  { icon: <FaCogs />, label: "CMS" },
-  { icon: <FaTh />, label: "Apps" },
-  { icon: <FaChartLine />, label: "Charts" },
-  { icon: <FaStar />, label: "Bootstrap" },
-  { icon: <FaHeart />, label: "Plugins" },
-  { icon: <FaWrench />, label: "Widget" },
-  { icon: <FaWpforms />, label: "Forms" },
-  { icon: <FaTable />, label: "Table" },
-  { icon: <FaCopy />, label: "Pages" },
 ];
 
 export default function Sidebar() {
@@ -77,7 +46,6 @@ export default function Sidebar() {
             >
               <span className={styles.icon}>{item.icon}</span>
               <span className={styles.label}>{item.label}</span>
-              {item.badge && <span className={styles.badge}>New</span>}
               {item.subItems && (
                 <FaChevronDown
                   className={`${styles.arrow} ${

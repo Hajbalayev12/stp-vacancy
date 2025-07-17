@@ -15,9 +15,9 @@
   }
 
   .CompanyItems {
-    width: 100%;
-    max-width: 220px;
-    height: 300px;
+    width: 15vw;
+    height: 20vw;
+    // height: 300px;
     color: #000000;
     border-radius: 12px;
     text-align: center;
@@ -38,10 +38,11 @@
     }
 
     img {
-      width: 12vh;
-      height: 9vh;
-      padding-top: 5vh;
-      padding-bottom: 3vh;
+      width: 5vw;
+      height: 5vw;
+      object-fit: contain;
+      margin-top: 20px;
+      margin-bottom: 10px;
     }
 
     h2 {

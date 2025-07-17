@@ -24,7 +24,7 @@ const WebsiteRoutes = () => {
       <Route path="/" element={<WebsiteLayout />}>
         <Route index element={<Home />} />
         <Route path="companies" element={<Companies />} />
-        <Route path="company" element={<Company />} />
+        <Route path="company/:id" element={<Company />} />
         <Route path="profile" element={<Profile />} />
         <Route path="vacancy" element={<Vacancy />} />
         <Route path="tomorrow" element={<Tomorrow />} />

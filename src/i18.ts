@@ -1,0 +1,148 @@
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+
+const resources = {
+  az: {
+    translation: {
+      adminPanel: "Admin Panel",
+      home: "Ana Səhifə",
+      companies: "Şirkətlər",
+      addCompany: "Şirkət Əlavə Et",
+      viewCompanies: "Şirkətlərə Bax",
+      vacancies: "Vakansiyalar",
+      addVacancy: "➕ Vakansiya Əlavə Et",
+      viewVacancies: "Vakansiyalara Bax",
+      accounts: "Hesablar",
+      users: "➕ İstifadəçilər",
+      language: "Dil",
+      companyName: "Sumqayıt Texnologiylar Parkı",
+      interviewSchedules: "Müsahibə Planları",
+      applications: "Müraciətlər",
+      profiles: "Profillər",
+      unreadMessages: "Oxunmamış Mesajlar",
+      vacancyStatus: "Vakansiya Statusu",
+      activity: "Aktivlik",
+      delivered: "Çatdırılıb",
+      expense: "Xərc",
+      profile: "Profil",
+      skills: "Bacarıqlar",
+      reactJs: "React js",
+      responsiveStyle: "Responsiv Stil",
+      design: "Dizayn",
+      daily: "Gündəlik",
+      weekly: "Həftəlik",
+      monthly: "Aylıq",
+
+      fillAllFields: "Zəhmət olmasa bütün xanaları doldurun.",
+      companyLogo: "Şirkət Logosu",
+
+      location: "Konum",
+      voen: "Şirkət VÖEN",
+      gmail: "Şirkət Gmail",
+      phone: "Şirkət Nömrəsi",
+      aboutCompany: "Şirkət Haqqında",
+      submit: "✅ Əlavə Et",
+    },
+  },
+  en: {
+    translation: {
+      adminPanel: "Dashboard",
+      home: "Home",
+      companies: "Companies",
+      addCompany: "Add Company",
+      viewCompanies: "View Companies",
+      vacancies: "Vacancies",
+      addVacancy: "➕ Add Vacancy",
+      viewVacancies: "View Vacancies",
+      accounts: "Accounts",
+      users: "➕ Users",
+      language: "Language",
+      companyName: "Sumgayit Technology Park",
+      interviewSchedules: "Interview Schedules",
+      applications: "Applications",
+      profiles: "Profiles",
+      unreadMessages: "Unread Messages",
+      vacancyStatus: "Vacancy Status",
+      activity: "Activity",
+      delivered: "Delivered",
+      expense: "Expense",
+      profile: "Profile",
+      skills: "Skills",
+      reactJs: "React js",
+      responsiveStyle: "Responsive Style",
+      design: "Design",
+      daily: "Daily",
+      weekly: "Weekly",
+      monthly: "Monthly",
+      fillAllFields: "Please fill in all the fields.",
+      companyLogo: "Company Logo",
+
+      location: "Location",
+      voen: "Company VAT",
+      gmail: "Company Gmail",
+      phone: "Company Phone",
+      aboutCompany: "About the Company",
+      submit: "✅ Submit",
+    },
+  },
+  ru: {
+    translation: {
+      adminPanel: "Админ Панель",
+      home: "Главная",
+      companies: "Компании",
+      addCompany: "Добавить компанию",
+      viewCompanies: "Просмотр компаний",
+      vacancies: "Вакансии",
+      addVacancy: "➕ Добавить вакансию",
+      viewVacancies: "Просмотр вакансий",
+      accounts: "Аккаунты",
+      users: "➕ Пользователи",
+      language: "Язык",
+      companyName: "Сумгайытский Технологический Парк",
+      interviewSchedules: "Расписание собеседований",
+      applications: "Заявки",
+      profiles: "Профили",
+      unreadMessages: "Непрочитанные сообщения",
+      vacancyStatus: "Статус вакансий",
+      activity: "Активность",
+      delivered: "Доставлено",
+      expense: "Расходы",
+      profile: "Профиль",
+      skills: "Навыки",
+      reactJs: "React js",
+      responsiveStyle: "Адаптивный стиль",
+      design: "Дизайн",
+      daily: "Ежедневно",
+      weekly: "Еженедельно",
+      monthly: "Ежемесячно",
+      fillAllFields: "Пожалуйста, заполните все поля.",
+      companyLogo: "Логотип компании",
+
+      location: "Местоположение",
+      voen: "ВÖЕН компании",
+      gmail: "Почта компании",
+      phone: "Телефон компании",
+      aboutCompany: "О компании",
+      submit: "✅ Добавить",
+    },
+  },
+};
+
+i18n
+  .use(LanguageDetector) // browser dilini avtomatik tanımaq
+  .use(initReactI18next) // React-i18next ilə qoşulma
+  .init({
+    resources,
+    fallbackLng: "az",
+    interpolation: {
+      escapeValue: false, // React artıq XSS-dən qoruyur
+    },
+    detection: {
+      order: ["localStorage", "navigator", "htmlTag"],
+      caches: ["localStorage"],
+    },
+    // debug: true, // istəsən aç
+  });
+
+export default i18n;

@@ -1,4 +1,6 @@
 .WebsiteLayout {
+  display: flex;
+  flex-direction: column;
   background-color: #e6f0ff;
   box-sizing: border-box;
   border-radius: 20px;
@@ -6,4 +8,7 @@
   overflow-y: auto;
   scrollbar-width: none;
   margin: 1.5vw 0;
+}
+.WebsiteLayout main {
+  flex-grow: 1;
 }

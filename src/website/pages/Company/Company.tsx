@@ -1,6 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./Company.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+
+interface TeamMember {
+  name: string;
+  position: string;
+  email: string;
+  photoUrl: string;
+}
+
+interface CompanyData {
+  id: number;
+  companyName: string;
+  companyAddress: string;
+  companyPhoneNumber: string;
+  companyEmail: string;
+  companyTin: string;
+  companyDescription: string;
+  totalEmployees: number;
+  companyLogoUrl: string;
+  responseTeamMemberDtos: TeamMember[];
+}
 
 interface Vacancy {
   id: number;
@@ -9,9 +29,13 @@ interface Vacancy {
 }
 
 export default function Company() {
+  const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<"vacancies" | "about">(
     "vacancies"
   );
+  const [companyData, setCompanyData] = useState<CompanyData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const vacancies: Vacancy[] = [
     { id: 1, title: "Front-end Developer", company: "STP MMC" },
@@ -21,23 +45,48 @@ export default function Company() {
     { id: 5, title: "Sistem İnzibatçılığı", company: "STP MMC" },
   ];
 
+  useEffect(() => {
+    if (!id) return;
+
+    fetch(`http://192.168.200.133:8081/api/companies/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Məlumat alınmadı");
+        return res.json();
+      })
+      .then((data) => setCompanyData(data))
+      .catch((err) => {
+        console.error("Error fetching company data:", err);
+        setError("Şirkət tapılmadı.");
+      })
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) return <div className={styles.Company}>Yüklənir...</div>;
+  if (error) return <div className={styles.Company}>{error}</div>;
+  if (!companyData) return null;
+
   return (
     <div className={styles.Company}>
       <div className={styles.companyCard}>
         <div className={styles.header}>
           <img
             className={styles.logo}
-            src="src/website/assets/stpmmc.png"
+            src={
+              companyData.companyLogoUrl &&
+              companyData.companyLogoUrl !== "string"
+                ? companyData.companyLogoUrl
+                : "/src/website/assets/Logo.png"
+            }
             alt="Company Logo"
           />
           <div>
-            <h1>STP MMC</h1>
+            <h1>{companyData.companyName}</h1>
             <p className={styles.sub}>Karyeranı Bizimlə Qur!</p>
             <div className={styles.meta}>
-              <span>stp.az</span>
+              <span>{companyData.companyEmail}</span>
               <span>Azərbaycan</span>
               <br />
-              <span>İstehsalat / 1500 İşçi</span>
+              <span>İstehsalat / {companyData.totalEmployees} İşçi</span>
             </div>
           </div>
         </div>
@@ -64,12 +113,17 @@ export default function Company() {
                 <div className={styles.LogoInfo}>
                   <img
                     className={styles.VacancyLogo}
-                    src="src/website/assets/stpmmc.png"
+                    src={
+                      companyData.companyLogoUrl &&
+                      companyData.companyLogoUrl !== "string"
+                        ? companyData.companyLogoUrl
+                        : "/src/website/assets/Logo.png"
+                    }
                     alt="Vacancy Logo"
                   />
                   <div className={styles.VacancyInfo}>
                     <h3>{vacancy.title}</h3>
-                    <p>{vacancy.company}</p>
+                    <p>{companyData.companyName}</p>
                   </div>
                 </div>
                 <Link to="/vacancy" className={styles.Applylink}>
@@ -82,68 +136,8 @@ export default function Company() {
           </div>
         ) : (
           <div className={styles.aboutCompany}>
-            <h2>STP MMC haqqında</h2>
-            <p>
-              STP-Sumqayıt Texnologiyalar Parkı regionda ilk texnopark olmaqla
-              yanaşı analoqu olmayan layihədir. 22 dekabr 2009-cu il tarixində
-              Azərbaycan Respublikasının prezidenti cənab İlham Əliyev
-              tərəfindən Texnoparkın birinci mərhələsi istifadəyə verilmişdir.
-              Həmin vaxtdan müəssisə daha da inkişaf etmiş, genişlənmiş və
-              30-dan çox yeni istehsal sahələri yaradılmışdır. STP-də əsasən,
-              ölkənin neft-qaz, enerji, kənd təsərrüfatı, inşaat sektoru və
-              eləcə də digər iqtisadi sahələrdə idxalı azaltmağa yönəldilmiş
-              məhsullar istehsal edilir. İstehsalat 50 hektarı qapalı olmaqla
-              ümumilikdə 152 hektar ərazini əhatə edir.
-            </p>
-
-            <p>
-              2020-ci ildə müştəri tələblərinə çevik adaptasiya olunmaq
-              məqsədilə şirkətin biznes və təşkilati idarəetmə forması
-              dəyişdirilərək şirkətlər qrupuna dəyişdirilib. STP-nin tərkibində
-              fəaliyyət göstərən zavod və istehsal sahələri yeni yaradılan
-              biznes vahidləri və müştərək şirkətlər olaraq birləşdirilib.
-              Hazırda STP-nin nəzarətinə 3 müştərək şirkət, 3 biznes vahidi və 1
-              zavod daxildir.
-            </p>
-
-            <h3>STP-nin Biznes Vahidləri:</h3>
-            <ul>
-              <li>STP Global Cable</li>
-              <li>STP Alüminium</li>
-              <li>STP Polymer</li>
-            </ul>
-
-            <h3>STP-nin Müştərək Şirkətləri:</h3>
-            <ul>
-              <li>SOCAR-STP</li>
-              <li>STP AH</li>
-              <li>Assan STP Panel</li>
-            </ul>
-
-            <h3>STP-nin Zavodları:</h3>
-            <ul>
-              <li>Qaynaq Quraşdırma Zavodu</li>
-              <li>Antikorroziya Örtükləri Zavodu</li>
-            </ul>
-
-            <p>
-              STP Şirkətlər Qrupu Azərbaycanın daxili bazarının tələbatını tam
-              ödəməklə yanaşı, müvafiq məhsulların xarici bazara satışını həyata
-              keçirmək gücündədir. STP yalnız bir çox sənaye və
-              elektroenergetika sahələri üçün məhsul və mühüm avadanlıqlar
-              istehsal edən sənaye mərkəzi deyil, həm də müasir
-              texnologiyaların, innovasiyalı mühəndisliyin geniş profilli və
-              ekoloji mərkəzidir.
-            </p>
-
-            <p>
-              Bütün istehsalat sahələri aparıcı dünya istehsalçılarının
-              məhsulları olmaqla ən son texnologiyalara əsaslanan avadanlıqlarla
-              təchiz olunmuşdur. Yalnız qurğu və avadanlıqlar deyil,
-              istehsalatda istifadə edilən xammal da beynəlxalq standartların
-              tələblərinə tam cavab verir. Bu səbəbdən də istehsal olunan
-              məhsulların keyfiyyəti olduqca yüksəkdir.
-            </p>
+            <h2>{companyData.companyName} haqqında</h2>
+            <p>{companyData.companyDescription}</p>
           </div>
         )}
       </div>

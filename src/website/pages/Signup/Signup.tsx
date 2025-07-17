@@ -1,6 +1,6 @@
 import styles from "./Signup.module.scss";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaEnvelope,
   FaLock,
@@ -10,10 +10,15 @@ import {
   FaUser,
   FaPhone,
   FaIdCard,
-  FaFileAlt,
+  FaEye,
+  FaEyeSlash,
 } from "react-icons/fa";
+import { useToast } from "../../../shared/context/ToastContext";
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const { showError, showSuccess } = useToast();
+
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
@@ -25,66 +30,169 @@ export default function Signup() {
     cv: null as File | null,
   });
 
-  const [errors, setErrors] = useState({
-    name: "",
-    surname: "",
-    email: "",
-    password: "",
-    confirm_password: "",
-    phone: "",
-    id_serial: "",
-    cv: "",
-  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword((prev) => !prev);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    const phoneRegex = /^\+994(50|51|55|70|77)[0-9]{7}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const idSerialRegex = /^(AA|AZE)\d{7}$/;
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+
+    if (!formData.name.trim()) newErrors.name = "Ad boş ola bilməz";
+    if (!formData.surname.trim()) newErrors.surname = "Soyad boş ola bilməz";
+
+    if (!formData.email.trim()) newErrors.email = "E-poçt boş ola bilməz";
+    else if (!emailRegex.test(formData.email))
+      newErrors.email = "E-poçt düzgün formatda deyil";
+
+    if (!formData.password.trim()) newErrors.password = "Şifrə boş ola bilməz";
+    else if (!passwordRegex.test(formData.password))
+      newErrors.password =
+        "Şifrə bir böyük hərf, bir rəqəm və bir xüsusi simvol daxil etməlidir";
+
+    if (formData.password !== formData.confirm_password)
+      newErrors.confirm_password = "Şifrələr uyğun deyil";
+
+    if (!formData.phone.trim())
+      newErrors.phone = "Əlaqə nömrəsi boş ola bilməz";
+    else if (!phoneRegex.test(formData.phone))
+      newErrors.phone = "Telefon nömrəsi düzgün deyil";
+
+    if (!formData.id_serial.trim())
+      newErrors.id_serial = "Seriya nömrəsi boş ola bilməz";
+    else if (!idSerialRegex.test(formData.id_serial))
+      newErrors.id_serial =
+        "Seriya nömrəsi 'AA1234567' və ya 'AZE1234567' formatında olmalıdır";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
     }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    let formIsValid = true;
-    const newErrors = { ...errors };
+    const payload = {
+      name: formData.name,
+      surname: formData.surname,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirm_password,
+      phone: formData.phone.startsWith("+")
+        ? formData.phone.slice(1)
+        : formData.phone,
+      seriaNumber: formData.id_serial,
+      cv: [], // not used in backend now
+    };
 
-    Object.keys(formData).forEach((field) => {
-      const fieldValue = formData[field as keyof typeof formData];
-      if (!fieldValue) {
-        formIsValid = false;
-        newErrors[field as keyof typeof newErrors] = "Bu bölmə doldurulmalıdır";
-      } else {
-        newErrors[field as keyof typeof newErrors] = "";
+    try {
+      const response = await fetch(
+        "http://192.168.200.133:8082/api/users/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        // Try parsing error JSON safely
+        let errorData = null;
+        try {
+          errorData = await response.json();
+        } catch (jsonError) {
+          console.error("Failed to parse error JSON:", jsonError);
+        }
+
+        if (
+          errorData &&
+          typeof errorData.message === "object" &&
+          errorData.message !== null
+        ) {
+          for (const key in errorData.message) {
+            if (errorData.message[key]) showError(errorData.message[key]);
+          }
+        } else {
+          showError(errorData?.message || "Xəta baş verdi");
+        }
+        console.error("Registration error:", errorData);
+        return;
       }
-    });
 
-    if (formData.password !== formData.confirm_password) {
-      formIsValid = false;
-      newErrors.confirm_password = "Şifrələr uyğun deyil";
-    }
+      // For success, parse response JSON safely
+      try {
+        await response.json();
+      } catch (jsonError) {
+        console.warn("Failed to parse success JSON response:", jsonError);
+      }
 
-    setErrors(newErrors);
-
-    if (formIsValid) {
-      console.log("Form Submitted Successfully");
-      // Burada serverə göndərmək və ya redirect edə bilərsən
+      showSuccess("Qeydiyyat uğurla tamamlandı!");
+      navigate("/signin");
+    } catch (error) {
+      showError("Serverə qoşulmaq mümkün olmadı");
+      console.error("Network or other error:", error);
     }
   };
+
+  const renderInput = (
+    label: string,
+    name: string,
+    type: string,
+    icon: React.ReactNode,
+    isPassword = false,
+    showPasswordState = false,
+    toggleShowPassword?: () => void
+  ) => (
+    <div className={styles.inputGroup} key={name}>
+      <label>{label}</label>
+      <div
+        className={`${styles.inputWrapper} ${
+          errors[name] ? styles.errorBorder : ""
+        }`}
+      >
+        {icon}
+        <input
+          name={name}
+          type={isPassword ? (showPasswordState ? "text" : "password") : type}
+          value={formData[name as keyof typeof formData] as string}
+          onChange={handleChange}
+          autoComplete={isPassword ? "new-password" : undefined}
+        />
+        {isPassword && toggleShowPassword && (
+          <span onClick={toggleShowPassword} style={{ cursor: "pointer" }}>
+            {showPasswordState ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        )}
+      </div>
+      {errors[name] && <span className={styles.error}>{errors[name]}</span>}
+    </div>
+  );
 
   return (
     <div className={styles.SignUp}>
       <div className={styles.SignupLeft}>
         <div className={styles.logoWrapper}>
           <img src="src/website/assets/stpmmcwhite.png" alt="STP Logo" />
-          <span>Sumqayıt Texnologiylar Parkı</span>
+          <span>Sumqayıt Texnologiyalar Parkı</span>
         </div>
         <div className={styles.infoBlock}>
           <FaUsers />
@@ -97,17 +205,14 @@ export default function Signup() {
           <FaClock />
           <div>
             <h3>Əməkdaşlıq</h3>
-            <p>
-              STP Şirkətlər Qrupunda 2000-dən çox işçi kollektivi ilə yüksək
-              komanda ruhunda əməkdaşlıq
-            </p>
+            <p>STP-də yüksək komanda ruhunda əməkdaşlıq</p>
           </div>
         </div>
         <div className={styles.infoBlock}>
           <FaUserFriends />
           <div>
             <h3>Əlavə təminatlar</h3>
-            <p>Gündəlik nəqliyyat, nahar və tibbi siğorta ilə təminat</p>
+            <p>Nəqliyyat, nahar və tibbi siğorta ilə təminat</p>
           </div>
         </div>
       </div>
@@ -118,166 +223,30 @@ export default function Signup() {
           <h1>Yeni hesab yarat!</h1>
         </div>
 
-        <form
-          method="POST"
-          encType="multipart/form-data"
-          onSubmit={handleSubmit}
-        >
-          <div className={styles.inputGroup}>
-            <label>Ad</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.name ? styles.errorBorder : ""
-              }`}
-            >
-              <FaUser />
-              <input
-                name="name"
-                type="text"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
-            {errors.name && <span className={styles.error}>{errors.name}</span>}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>Soyad</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.surname ? styles.errorBorder : ""
-              }`}
-            >
-              <FaUser />
-              <input
-                name="surname"
-                type="text"
-                value={formData.surname}
-                onChange={handleChange}
-              />
-            </div>
-            {errors.surname && (
-              <span className={styles.error}>{errors.surname}</span>
-            )}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>Email</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.email ? styles.errorBorder : ""
-              }`}
-            >
-              <FaEnvelope />
-              <input
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            {errors.email && (
-              <span className={styles.error}>{errors.email}</span>
-            )}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>Şifrə</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.password ? styles.errorBorder : ""
-              }`}
-            >
-              <FaLock />
-              <input
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-            {errors.password && (
-              <span className={styles.error}>{errors.password}</span>
-            )}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>Şifrəni təkrar daxil edin</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.confirm_password ? styles.errorBorder : ""
-              }`}
-            >
-              <FaLock />
-              <input
-                name="confirm_password"
-                type="password"
-                value={formData.confirm_password}
-                onChange={handleChange}
-              />
-            </div>
-            {errors.confirm_password && (
-              <span className={styles.error}>{errors.confirm_password}</span>
-            )}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>Mobil nömrə</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.phone ? styles.errorBorder : ""
-              }`}
-            >
-              <FaPhone />
-              <input
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-            {errors.phone && (
-              <span className={styles.error}>{errors.phone}</span>
-            )}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>Şəxsiyyət vəsiqəsinin seriya nömrəsi</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.id_serial ? styles.errorBorder : ""
-              }`}
-            >
-              <FaIdCard />
-              <input
-                name="id_serial"
-                type="text"
-                value={formData.id_serial}
-                onChange={handleChange}
-              />
-            </div>
-            {errors.id_serial && (
-              <span className={styles.error}>{errors.id_serial}</span>
-            )}
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label>CV (PDF/DOC)</label>
-            <div
-              className={`${styles.inputWrapper} ${
-                errors.cv ? styles.errorBorder : ""
-              }`}
-            >
-              <FaFileAlt />
-              <input
-                name="cv"
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={handleChange}
-              />
-            </div>
-            {errors.cv && <span className={styles.error}>{errors.cv}</span>}
-          </div>
+        <form onSubmit={handleSubmit}>
+          {renderInput("Ad", "name", "text", <FaUser />)}
+          {renderInput("Soyad", "surname", "text", <FaUser />)}
+          {renderInput("Email", "email", "email", <FaEnvelope />)}
+          {renderInput(
+            "Şifrə",
+            "password",
+            "password",
+            <FaLock />,
+            true,
+            showPassword,
+            togglePasswordVisibility
+          )}
+          {renderInput(
+            "Şifrəni təkrar daxil edin",
+            "confirm_password",
+            "password",
+            <FaLock />,
+            true,
+            showConfirmPassword,
+            toggleConfirmPasswordVisibility
+          )}
+          {renderInput("Mobil nömrə", "phone", "tel", <FaPhone />)}
+          {renderInput("Seriya nömrəsi", "id_serial", "text", <FaIdCard />)}
 
           <button type="submit">Qeydiyyatdan keç</button>
         </form>
@@ -291,7 +260,7 @@ export default function Signup() {
         <div className={styles.Links}>
           <Link to="/">Ana Səhifə</Link>
           <Link to="/companies">Şirkətlər</Link>
-          <Link to="/profile">Profile</Link>
+          <Link to="/profile">Profil</Link>
         </div>
       </div>
     </div>

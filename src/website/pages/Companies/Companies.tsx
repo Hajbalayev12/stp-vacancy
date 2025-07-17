@@ -1,81 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Companies.module.scss";
 
+interface Company {
+  id: number;
+  companyName: string;
+  companyLogoUrl: string;
+  companyAddress: string;
+  vacancyCount: number;
+}
+
 export default function Companies() {
-  const [companies] = useState([
-    {
-      name: "STP MMC",
-      image: "src/website/assets/stpmmc.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "STP GLOBAL CABLE",
-      image: "src/website/assets/stpcable.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "STP ALUMINIUM",
-      image: "src/website/assets/aluminium.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "STP-AH",
-      image: "src/website/assets/stpah.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "ASSAN-STP PANEL",
-      image: "src/website/assets/stppanel.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "STP POLYMER",
-      image: "src/website/assets/stppolymer.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "STP METAL STRUCTURES",
-      image: "src/website/assets/stpmmc.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "SOCAR-STP",
-      image: "src/website/assets/socarstp.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "STP-Btech",
-      image: "src/website/assets/stpmmc.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-    {
-      name: "Azroksan",
-      image: "src/website/assets/azroksan.png",
-      address: "Sumqayıt şəh.,Z.Tağıev qəs.",
-      vacancies: 5,
-    },
-  ]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+
+  useEffect(() => {
+    fetch("http://192.168.200.133:8081/api/companies/all/company")
+      .then((res) => res.json())
+      .then((data) => {
+        setCompanies(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching companies:", error);
+      });
+  }, []);
 
   return (
     <div className={styles.Companies}>
       <div className={styles.CompaniesGrid}>
-        {companies.map((company, index) => (
-          <Link to="/company" key={index}>
+        {companies.map((company) => (
+          <Link to={`/company/${company.id}`} key={company.id}>
             <div className={styles.CompanyItems}>
-              <img src={company.image} alt={company.name} />
-              <h2>{company.name}</h2>
-              <p>{company.address}</p>
-              <button>Vakansiya sayı: {company.vacancies}</button>
+              <img
+                src={company.companyLogoUrl}
+                alt={company.companyName}
+                className={styles.CompanyLogo}
+              />
+              <h2>{company.companyName}</h2>
+              <p>{company.companyAddress}</p>
+              <button>Vakansiya sayı: {company.vacancyCount}</button>
             </div>
           </Link>
         ))}
