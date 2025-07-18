@@ -162,7 +162,8 @@
       gap: 1rem;
 
       .Signin,
-      .Signup {
+      .Signup,
+      .Signout {
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -172,7 +173,7 @@
         font-weight: 600;
         font-size: 1rem;
         transition: all 0.3s ease;
-
+        cursor: pointer;
         &.active {
           border: 2px solid #0077ff;
         }
@@ -190,6 +191,16 @@
       }
 
       .Signup {
+        background-color: transparent;
+        border: 1px solid #4285f4;
+        color: #4285f4;
+
+        &:hover {
+          background-color: #4285f4;
+          color: white;
+        }
+      }
+      .Signout {
         background-color: transparent;
         border: 1px solid #4285f4;
         color: #4285f4;

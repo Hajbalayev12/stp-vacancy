@@ -104,7 +104,11 @@ export default function Signin() {
       }
 
       showSuccess("Uğurla daxil oldunuz!");
-      // localStorage.setItem("token", data.token); // if needed
+
+      // Update localStorage and notify other components
+      localStorage.setItem("isLoggedIn", "true");
+      window.dispatchEvent(new Event("loginStatusChanged"));
+
       navigate("/");
     } catch (err) {
       showError("Server xətası baş verdi.");
