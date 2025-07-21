@@ -29,7 +29,7 @@ export default function AdminRoutes() {
         <Route path="viewvacancies" element={<ViewVacancies />} />
         <Route path="viewcompanies" element={<ViewCompanies />} />
         <Route path="companyinfo/:id" element={<CompanyInfo />} />
-        <Route path="vacancyinfo" element={<VacancyInfo />} />
+        <Route path="vacancyinfo/:vacancyId" element={<VacancyInfo />} />
       </Route>
     </Routes>
   );

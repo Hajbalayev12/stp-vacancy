@@ -1,7 +1,7 @@
 import styles from "./Home.module.scss";
 import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
@@ -29,29 +29,22 @@ const StyledPagination = styled(Pagination)(() => ({
   },
 }));
 
-export default function Home() {
-  const vacancies = [
-    {
-      id: 1,
-      title: "Front-end Developer",
-      logo: "src/website/assets/stpmmc.png",
-    },
-    { id: 2, title: "HelpDesk", logo: "src/website/assets/stpmmc.png" },
-    { id: 3, title: "HR", logo: "src/website/assets/socarstp.png" },
-    { id: 4, title: "Satınalma", logo: "src/website/assets/stpah.png" },
-    {
-      id: 5,
-      title: "Sistem İnzibatçılığı",
-      logo: "src/website/assets/stpcable.png",
-    },
-    {
-      id: 6,
-      title: "Back-end Developer",
-      logo: "src/website/assets/stpmmc.png",
-    },
-    { id: 7, title: "Network Engineer", logo: "src/website/assets/stpmmc.png" },
-  ];
+type Vacancy = {
+  id: number;
+  position: string;
+  companyDto: {
+    companyName?: string | null;
+    companyLogoUrl?: string | null;
+  } | null;
+  category: {
+    name: string;
+  };
+  vacancyStatus: boolean;
+};
 
+export default function Home() {
+  const [vacancies, setVacancies] = useState<Vacancy[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const vacanciesPerPage = 5;
@@ -64,6 +57,27 @@ export default function Home() {
     "DevOps Engineer",
   ];
 
+  useEffect(() => {
+    const fetchVacancies = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          "http://192.168.200.133:8083/api/vacancies/active"
+        );
+        if (!res.ok) throw new Error("Failed to fetch vacancies");
+        const data = await res.json();
+        setVacancies(data);
+      } catch (error) {
+        console.error("Error fetching vacancies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVacancies();
+  }, []);
+
+  // Pagination logic
   const indexOfLastVacancy = currentPage * vacanciesPerPage;
   const indexOfFirstVacancy = indexOfLastVacancy - vacanciesPerPage;
   const currentVacancies = vacancies.slice(
@@ -159,26 +173,36 @@ export default function Home() {
       </div>
 
       <div className={styles.VacancyList}>
-        {currentVacancies.map((vacancy) => (
-          <div className={styles.VacancyListItems} key={vacancy.id}>
-            <div className={styles.LogoInfo}>
-              <img
-                src={vacancy.logo}
-                alt="vacancy"
-                className={styles.VacancyLogo}
-              />
-              <div className={styles.VacancyInfo}>
-                <h3>{vacancy.title}</h3>
-                <p>The Power of Tomorrow</p>
+        {loading ? (
+          <p>Loading vacancies...</p>
+        ) : currentVacancies.length === 0 ? (
+          <p>No vacancies found.</p>
+        ) : (
+          currentVacancies.map((vacancy) => (
+            <div className={styles.VacancyListItems} key={vacancy.id}>
+              <div className={styles.LogoInfo}>
+                <img
+                  src={
+                    vacancy.companyDto?.companyLogoUrl
+                      ? vacancy.companyDto.companyLogoUrl
+                      : "src/website/assets/default_logo.png"
+                  }
+                  alt={vacancy.companyDto?.companyName || "Company Logo"}
+                  className={styles.VacancyLogo}
+                />
+                <div className={styles.VacancyInfo}>
+                  <h3>{vacancy.position}</h3>
+                  <p>{vacancy.companyDto?.companyName || "Naməlum Şirkət"}</p>
+                </div>
               </div>
+              <Link to={`/vacancy/${vacancy.id}`} className={styles.Applylink}>
+                <div className={styles.ApplyBtn}>
+                  <h4>Müraciət et</h4>
+                </div>
+              </Link>
             </div>
-            <Link to="/vacancy" className={styles.Applylink}>
-              <div className={styles.ApplyBtn}>
-                <h4>Müraciət et</h4>
-              </div>
-            </Link>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div className={styles.Pagination}>

@@ -26,7 +26,7 @@ const WebsiteRoutes = () => {
         <Route path="companies" element={<Companies />} />
         <Route path="company/:id" element={<Company />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="vacancy" element={<Vacancy />} />
+        <Route path="vacancy/:id" element={<Vacancy />} />
         <Route path="tomorrow" element={<Tomorrow />} />
         <Route path="zerif" element={<Zerif />} />
       </Route>
