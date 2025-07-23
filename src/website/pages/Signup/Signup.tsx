@@ -40,9 +40,9 @@ export default function Signup() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    const phoneRegex = /^\+994(50|51|55|70|77)[0-9]{7}$/;
+    const phoneRegex = /^\+994(50|51|55|70|77)\d{7}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const idSerialRegex = /^(AA|AZE)\d{7}$/;
+    const idSerialRegex = /^(AA\d{7}|AZE\d{8})$/;
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 
@@ -64,13 +64,14 @@ export default function Signup() {
     if (!formData.phone.trim())
       newErrors.phone = "Əlaqə nömrəsi boş ola bilməz";
     else if (!phoneRegex.test(formData.phone))
-      newErrors.phone = "Telefon nömrəsi düzgün deyil";
+      newErrors.phone =
+        "Telefon nömrəsi düzgün formatda deyil. +99450XXXXXXX kimi yazın";
 
     if (!formData.id_serial.trim())
       newErrors.id_serial = "Seriya nömrəsi boş ola bilməz";
     else if (!idSerialRegex.test(formData.id_serial))
       newErrors.id_serial =
-        "Seriya nömrəsi 'AA1234567' və ya 'AZE1234567' formatında olmalıdır";
+        "Seriya nömrəsi 'AA1234567' (7 rəqəm) və ya 'AZE12345678' (8 rəqəm) formatında olmalıdır";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -99,7 +100,7 @@ export default function Signup() {
         ? formData.phone.slice(1)
         : formData.phone,
       seriaNumber: formData.id_serial,
-      cv: [], // not used in backend now
+      cv: [],
     };
 
     try {
@@ -115,7 +116,6 @@ export default function Signup() {
       );
 
       if (!response.ok) {
-        // Try parsing error JSON safely
         let errorData = null;
         try {
           errorData = await response.json();
@@ -138,7 +138,6 @@ export default function Signup() {
         return;
       }
 
-      // For success, parse response JSON safely
       try {
         await response.json();
       } catch (jsonError) {
@@ -175,6 +174,13 @@ export default function Signup() {
           type={isPassword ? (showPasswordState ? "text" : "password") : type}
           value={formData[name as keyof typeof formData] as string}
           onChange={handleChange}
+          placeholder={
+            name === "phone"
+              ? "+99450XXXXXXX"
+              : name === "id_serial"
+              ? "AA1234567 və ya AZE12345678"
+              : undefined
+          }
           autoComplete={isPassword ? "new-password" : undefined}
         />
         {isPassword && toggleShowPassword && (
