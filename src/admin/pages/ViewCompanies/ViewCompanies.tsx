@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Viewcompanies.module.scss";
 import { Link } from "react-router-dom";
 
@@ -8,6 +8,7 @@ interface Company {
   companyName?: string;
   companyAddress?: string;
   companyLogoUrl?: string;
+  activeVacancyCount?: number; // ✅ added this line
 }
 
 const Viewcompanies = () => {
@@ -87,7 +88,7 @@ const Viewcompanies = () => {
               <p className={styles.companyAddress}>
                 {company.companyAddress || "Ünvan mövcud deyil"}
               </p>
-              <button>Vakansiya sayı: 5</button>
+              <button>Vakansiya sayı: {company.activeVacancyCount ?? 0}</button>
             </div>
           </Link>
         ))}

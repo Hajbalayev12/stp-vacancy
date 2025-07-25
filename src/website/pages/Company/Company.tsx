@@ -24,9 +24,18 @@ interface CompanyData {
 
 interface Vacancy {
   id: number;
-  title: string;
-  company: string;
+  position: string;
+  companyDto: {
+    companyName: string;
+    companyLogoUrl: string;
+  };
 }
+
+const getFullImageUrl = (url?: string) => {
+  if (!url) return "/assets/default_logo.png";
+  if (url.startsWith("http") || url.startsWith("https")) return url;
+  return `http://192.168.200.133:8083/${url}`;
+};
 
 export default function Company() {
   const { id } = useParams<{ id: string }>();
@@ -36,18 +45,12 @@ export default function Company() {
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const vacancies: Vacancy[] = [
-    { id: 1, title: "Front-end Developer", company: "STP MMC" },
-    { id: 2, title: "HelpDesk", company: "STP MMC" },
-    { id: 3, title: "HR", company: "STP MMC" },
-    { id: 4, title: "Satınalma", company: "STP MMC" },
-    { id: 5, title: "Sistem İnzibatçılığı", company: "STP MMC" },
-  ];
+  const [vacancies, setVacancies] = useState<Vacancy[]>([]);
 
   useEffect(() => {
     if (!id) return;
 
+    // Şirkət məlumatını çək
     fetch(`http://192.168.200.133:8081/api/companies/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Məlumat alınmadı");
@@ -57,6 +60,17 @@ export default function Company() {
       .catch((err) => {
         console.error("Error fetching company data:", err);
         setError("Şirkət tapılmadı.");
+      });
+
+    // Aktiv vakansiyaları çək
+    fetch(`http://192.168.200.133:8083/api/vacancies/active/company/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Vakansiyalar alınmadı");
+        return res.json();
+      })
+      .then((data) => setVacancies(data))
+      .catch((err) => {
+        console.error("Error fetching vacancies:", err);
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -75,7 +89,7 @@ export default function Company() {
               companyData.companyLogoUrl &&
               companyData.companyLogoUrl !== "string"
                 ? companyData.companyLogoUrl
-                : "/src/website/assets/Logo.png"
+                : "/assets/default_logo.png"
             }
             alt="Company Logo"
           />
@@ -108,31 +122,38 @@ export default function Company() {
 
         {activeTab === "vacancies" ? (
           <div className={styles.VacancyList}>
-            {vacancies.map((vacancy) => (
-              <div key={vacancy.id} className={styles.VacancyListItems}>
-                <div className={styles.LogoInfo}>
-                  <img
-                    className={styles.VacancyLogo}
-                    src={
-                      companyData.companyLogoUrl &&
-                      companyData.companyLogoUrl !== "string"
-                        ? companyData.companyLogoUrl
-                        : "/src/website/assets/Logo.png"
-                    }
-                    alt="Vacancy Logo"
-                  />
-                  <div className={styles.VacancyInfo}>
-                    <h3>{vacancy.title}</h3>
-                    <p>{companyData.companyName}</p>
+            {vacancies.length > 0 ? (
+              vacancies.map((vacancy) => (
+                <div key={vacancy.id} className={styles.VacancyListItems}>
+                  <div className={styles.LogoInfo}>
+                    <img
+                      src={getFullImageUrl(vacancy.companyDto?.companyLogoUrl)}
+                      alt={vacancy.companyDto?.companyName || "Company Logo"}
+                      className={styles.VacancyLogo}
+                    />
+                    <div className={styles.VacancyInfo}>
+                      <h3>{vacancy.position || "Vakansiya"}</h3>
+                      <p>
+                        {vacancy.companyDto?.companyName ||
+                          "The Power of Tomorrow"}
+                      </p>
+                    </div>
                   </div>
+                  <Link
+                    to={`/vacancy/${vacancy.id}`}
+                    className={styles.Applylink}
+                  >
+                    <div className={styles.ApplyBtn}>
+                      <h4>Müraciət et</h4>
+                    </div>
+                  </Link>
                 </div>
-                <Link to="/vacancy" className={styles.Applylink}>
-                  <div className={styles.ApplyBtn}>
-                    <h4>Müraciət et</h4>
-                  </div>
-                </Link>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p style={{ textAlign: "center", marginTop: "1rem" }}>
+                Bu şirkətdə aktiv vakansiya yoxdur.
+              </p>
+            )}
           </div>
         ) : (
           <div className={styles.aboutCompany}>

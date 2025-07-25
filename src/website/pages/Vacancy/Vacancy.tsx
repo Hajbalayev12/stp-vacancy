@@ -1,10 +1,62 @@
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import styles from "./Vacancy.module.scss";
-import { FaMapMarkerAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
-// import { GoShareAndroid } from "react-icons/go";
-import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import {
+  FaMapMarkerAlt,
+  FaFacebookF,
+  FaTwitter,
+  FaLinkedinIn,
+} from "react-icons/fa";
+
+type Vacancy = {
+  id: number;
+  position: string;
+  experienceRequired: string;
+  educationLevel: string;
+  major: string;
+  language: string;
+  skills: string;
+  requirements: string;
+  responsibilities: string;
+  createdDate: string;
+  startDate: string;
+  endDate: string;
+  vacancyStatus: boolean;
+  companyDto: {
+    companyName: string;
+    companyAddress: string;
+    companyPhoneNumber: string;
+    companyEmail: string;
+    companyLogoUrl: string;
+    totalEmployees: number;
+  };
+  employmentType: {
+    id: number;
+    name: string;
+  };
+  jobMode: {
+    id: number;
+    name: string;
+  };
+  category: {
+    id: number;
+    name: string;
+  };
+};
 
 const VacancyInfo = () => {
+  const { id } = useParams();
+  const [vacancy, setVacancy] = useState<Vacancy | null>(null);
+
+  useEffect(() => {
+    fetch(`http://192.168.200.133:8083/api/vacancies/${id}`)
+      .then((res) => res.json())
+      .then((data) => setVacancy(data))
+      .catch((err) => console.error(err));
+  }, [id]);
+
+  if (!vacancy) return <div>Loading...</div>;
+
   return (
     <div className={styles.VacancyInfo}>
       <div className={styles.content}>
@@ -12,63 +64,39 @@ const VacancyInfo = () => {
         <div className={styles.left}>
           <div className={styles.headerCard}>
             <div className={styles.logo}>
-              <img src="src/website/assets/stpmmc.png" alt="Company logo" />
+              <img src={vacancy.companyDto.companyLogoUrl} alt="Company logo" />
             </div>
             <div>
-              <h2 className={styles.position}>NDT Technician</h2>
-              <p className={styles.department}>
-                Xüsusi Sənaye Layihələri Ofisi
-              </p>
+              <h2 className={styles.position}>{vacancy.position}</h2>
+              <p className={styles.department}>{vacancy.category.name}</p>
               <p className={styles.meta}>
-                <FaMapMarkerAlt /> STP MMC
+                <FaMapMarkerAlt /> {vacancy.companyDto.companyName}
               </p>
               <p className={styles.date}>
-                Elanın yerləşdirilmə tarixi: 2025-04-15
+                Elanın yerləşdirilmə tarixi: {vacancy.createdDate}
               </p>
             </div>
           </div>
 
-          {/* Aşağı hissələr */}
           <div className={styles.infoBlock}>
             <h3>Namizədə olan tələblər:</h3>
             <ul>
-              <li>Minimum 2 years of hands-on experience in NDT inspections</li>
-              <li>Familiarity with quality systems such as AS9100, NADCAP</li>
-              <li>
-                Proficient in reading and interpreting technical documentation
-                in English
-              </li>
-              <li>
-                Open to learning, detail-oriented, and strong analytical
-                thinking skills
-              </li>
-              <li>Willing to travel and work in shifts when required</li>
+              {vacancy.requirements.split("\n").map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
             </ul>
           </div>
 
           <div className={styles.infoBlock}>
             <h3>Ümumi vəzifə öhdəlikləri:</h3>
             <ul>
-              <li>
-                Perform inspections using UT, MT, PT, RT, and VT techniques
-              </li>
-              <li>
-                Follow inspection plans, technical work instructions, and
-                procedures
-              </li>
-              <li>
-                Ensure accurate and timely conformity assessments and reporting
-              </li>
-              <li>Conduct periodic checks and calibration of NDT equipment</li>
-              <li>
-                Ensure compliance with customer requirements and international
-                quality systems
-              </li>
+              {vacancy.responsibilities.split("\n").map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
             </ul>
           </div>
 
-          {/* Əlavə şəkil */}
-          <div className={styles.extraImageSection}>
+          {/* <div className={styles.extraImageSection}>
             <h3>Əlavə Vizual Məlumat</h3>
             <div className={styles.imageRow}>
               <img
@@ -87,13 +115,11 @@ const VacancyInfo = () => {
                 className={styles.extraImage}
               />
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Sağ tərəf */}
         <div className={styles.right}>
-          {/* <div className={styles.shareBtn}><GoShareAndroid />Paylaş</div> */}
-
           <div className={styles.shareWrapper}>
             <div className={styles.shareButton}>
               <span>Paylaş</span>
@@ -131,23 +157,22 @@ const VacancyInfo = () => {
             <h4>Vakansiya detalları</h4>
             <ul>
               <li>
-                <strong>Məşğulluq növü:</strong> Tam ştat
+                <strong>Məşğulluq növü:</strong> {vacancy.employmentType.name}
               </li>
               <li>
-                <strong>Təcrübə tələbi:</strong> 1-3 il
+                <strong>Təcrübə tələbi:</strong> {vacancy.experienceRequired}
               </li>
               <li>
-                <strong>Təhsil:</strong> Ali təhsil - Bakalavr
+                <strong>Təhsil:</strong> {vacancy.educationLevel}
               </li>
               <li>
-                <strong>Ixtisas:</strong> Bachelor’s degree in a relevant
-                technical field
+                <strong>Ixtisas:</strong> {vacancy.major}
               </li>
               <li>
-                <strong>Dil biliyi:</strong> İngilis dili - Orta
+                <strong>Dil biliyi:</strong> {vacancy.language}
               </li>
               <li>
-                <strong>Komputer bacarıqları:</strong> Ms Word ,Ms Excel
+                <strong>Komputer bacarıqları:</strong> {vacancy.skills}
               </li>
             </ul>
 

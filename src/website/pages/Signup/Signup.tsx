@@ -25,8 +25,9 @@ export default function Signup() {
     email: "",
     password: "",
     confirm_password: "",
-    phone: "",
-    id_serial: "",
+    phone: "", // Only 9 digits, e.g. "501234567"
+    id_prefix: "AA",
+    id_number: "",
     cv: null as File | null,
   });
 
@@ -40,11 +41,10 @@ export default function Signup() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    const phoneRegex = /^\+994(50|51|55|70|77)\d{7}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const idSerialRegex = /^(AA\d{7}|AZE\d{8})$/;
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
+    const phoneRegex = /^(50|51|55|70|77)\d{7}$/;
 
     if (!formData.name.trim()) newErrors.name = "Ad boş ola bilməz";
     if (!formData.surname.trim()) newErrors.surname = "Soyad boş ola bilməz";
@@ -64,25 +64,44 @@ export default function Signup() {
     if (!formData.phone.trim())
       newErrors.phone = "Əlaqə nömrəsi boş ola bilməz";
     else if (!phoneRegex.test(formData.phone))
-      newErrors.phone =
-        "Telefon nömrəsi düzgün formatda deyil. +99450XXXXXXX kimi yazın";
+      newErrors.phone = "Telefon nömrəsi düzgün formatda deyil";
+    else if (formData.phone.length !== 9)
+      newErrors.phone = "Telefon nömrəsi 9 rəqəmdən ibarət olmalıdır";
 
-    if (!formData.id_serial.trim())
-      newErrors.id_serial = "Seriya nömrəsi boş ola bilməz";
-    else if (!idSerialRegex.test(formData.id_serial))
-      newErrors.id_serial =
-        "Seriya nömrəsi 'AA1234567' (7 rəqəm) və ya 'AZE12345678' (8 rəqəm) formatında olmalıdır";
+    if (!formData.id_number.trim()) {
+      newErrors.id_number = "Seriya nömrəsi boş ola bilməz";
+    } else {
+      const length = formData.id_prefix === "AA" ? 7 : 8;
+      const digitRegex = /^\d+$/;
+      if (!digitRegex.test(formData.id_number)) {
+        newErrors.id_number = "Yalnız rəqəmlər daxil edilməlidir";
+      } else if (formData.id_number.length !== length) {
+        newErrors.id_number = `${formData.id_prefix} üçün ${length} rəqəm daxil edilməlidir`;
+      }
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files ? files[0] : value,
-    }));
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === "cv") {
+      const input = e.target as HTMLInputElement;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: input.files?.[0] || null,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
@@ -96,10 +115,8 @@ export default function Signup() {
       email: formData.email,
       password: formData.password,
       confirmPassword: formData.confirm_password,
-      phone: formData.phone.startsWith("+")
-        ? formData.phone.slice(1)
-        : formData.phone,
-      seriaNumber: formData.id_serial,
+      phone: "994" + formData.phone,
+      seriaNumber: formData.id_prefix + formData.id_number,
       cv: [],
     };
 
@@ -108,9 +125,7 @@ export default function Signup() {
         "http://192.168.200.133:8082/api/users/register",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         }
       );
@@ -174,13 +189,6 @@ export default function Signup() {
           type={isPassword ? (showPasswordState ? "text" : "password") : type}
           value={formData[name as keyof typeof formData] as string}
           onChange={handleChange}
-          placeholder={
-            name === "phone"
-              ? "+99450XXXXXXX"
-              : name === "id_serial"
-              ? "AA1234567 və ya AZE12345678"
-              : undefined
-          }
           autoComplete={isPassword ? "new-password" : undefined}
         />
         {isPassword && toggleShowPassword && (
@@ -251,8 +259,74 @@ export default function Signup() {
             showConfirmPassword,
             toggleConfirmPasswordVisibility
           )}
-          {renderInput("Mobil nömrə", "phone", "tel", <FaPhone />)}
-          {renderInput("Seriya nömrəsi", "id_serial", "text", <FaIdCard />)}
+
+          {/* Custom phone input */}
+          <div className={styles.inputGroup}>
+            <label>Mobil nömrə</label>
+            <div
+              className={`${styles.inputWrapper} ${
+                errors.phone ? styles.errorBorder : ""
+              }`}
+            >
+              <FaPhone />
+              <span style={{ paddingRight: "4px", userSelect: "none" }}>
+                +994
+              </span>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="501234567"
+                maxLength={9}
+                minLength={9}
+                style={{ flex: 1 }}
+              />
+            </div>
+            {errors.phone && (
+              <span className={styles.error}>{errors.phone}</span>
+            )}
+          </div>
+
+          {/* Serial input with prefix dropdown inline */}
+          <div className={styles.inputGroup}>
+            <label>Seriya nömrəsi</label>
+            <div
+              className={`${styles.inputWrapper} ${
+                errors.id_number ? styles.errorBorder : ""
+              }`}
+            >
+              <FaIdCard />
+              <select
+                name="id_prefix"
+                value={formData.id_prefix}
+                onChange={handleChange}
+                style={{
+                  height: "70%",
+                  border: "1px solid black",
+                  borderRadius: "0.5vw",
+                }}
+              >
+                <option value="AA">AA</option>
+                <option value="AZE">AZE</option>
+              </select>
+              <input
+                type="text"
+                name="id_number"
+                value={formData.id_number}
+                onChange={handleChange}
+                placeholder={
+                  formData.id_prefix === "AA" ? "1234567" : "12345678"
+                }
+                maxLength={formData.id_prefix === "AA" ? 7 : 8}
+                minLength={formData.id_prefix === "AA" ? 7 : 8}
+                style={{ flex: 1 }}
+              />
+            </div>
+            {errors.id_number && (
+              <span className={styles.error}>{errors.id_number}</span>
+            )}
+          </div>
 
           <button type="submit">Qeydiyyatdan keç</button>
         </form>

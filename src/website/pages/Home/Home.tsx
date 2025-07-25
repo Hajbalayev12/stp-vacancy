@@ -1,5 +1,5 @@
 import styles from "./Home.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import Pagination from "@mui/material/Pagination";
@@ -11,7 +11,6 @@ const StyledPagination = styled(Pagination)(() => ({
     color: "#407bff",
     borderColor: "#407bff",
     backgroundColor: "white",
-
     "&:hover": {
       backgroundColor: "#407bff",
       color: "white",
@@ -21,7 +20,6 @@ const StyledPagination = styled(Pagination)(() => ({
     backgroundColor: "#407bff",
     color: "white",
     borderColor: "#407bff",
-
     "&:hover": {
       backgroundColor: "#407bff",
       color: "white",
@@ -47,7 +45,24 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const vacanciesPerPage = 5;
+  const vacanciesPerPage = 3;
+
+  const [formOptions, setFormOptions] = useState({
+    categories: [],
+    employmentTypes: [],
+    jobModes: [],
+  });
+
+  const [companies, setCompanies] = useState<
+    { id: number; companyName: string }[]
+  >([]);
+
+  // Filters state
+  const [selectedCompanyId, setSelectedCompanyId] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [selectedEmploymentTypeId, setSelectedEmploymentTypeId] = useState("");
+  const [selectedJobModeId, setSelectedJobModeId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const popularVacancies = [
     "Frontend Developer",
@@ -57,34 +72,100 @@ export default function Home() {
     "DevOps Engineer",
   ];
 
+  const navigate = useNavigate();
+
+  // Fetch form options and companies on mount
   useEffect(() => {
-    const fetchVacancies = async () => {
-      setLoading(true);
+    const fetchFormOptions = async () => {
       try {
         const res = await fetch(
-          "http://192.168.200.133:8083/api/vacancies/active"
+          "http://192.168.200.133:8083/api/form-options/form-options"
         );
-        if (!res.ok) throw new Error("Failed to fetch vacancies");
         const data = await res.json();
-        setVacancies(data);
-      } catch (error) {
-        console.error("Error fetching vacancies:", error);
+        setFormOptions({
+          categories: data.categories || [],
+          employmentTypes: data.employmentTypes || [],
+          jobModes: data.jobModes || [],
+        });
+      } catch (err) {
+        console.error("Error fetching form options:", err);
+      }
+    };
+
+    const fetchCompanies = async () => {
+      try {
+        const res = await fetch(
+          "http://192.168.200.133:8081/api/companies/all/company"
+        );
+        const data = await res.json();
+        setCompanies(data || []);
+      } catch (err) {
+        console.error("Error fetching companies:", err);
+      }
+    };
+
+    fetchFormOptions();
+    fetchCompanies();
+  }, []);
+
+  // Fetch vacancies automatically when filters or searchTerm change
+  useEffect(() => {
+    const fetchFilteredVacancies = async () => {
+      setLoading(true);
+      try {
+        const queryParams = new URLSearchParams();
+
+        if (selectedCompanyId)
+          queryParams.append("companyId", selectedCompanyId);
+        if (selectedCategoryId)
+          queryParams.append("categoryId", selectedCategoryId);
+        if (selectedEmploymentTypeId)
+          queryParams.append("employmentTypeId", selectedEmploymentTypeId);
+        if (selectedJobModeId)
+          queryParams.append("jobModeId", selectedJobModeId);
+        if (searchTerm) queryParams.append("vacancyName", searchTerm);
+
+        // Add pagination
+        const size = 5; // or 10
+        queryParams.append("pageNumber", currentPage.toString());
+        queryParams.append("size", size.toString());
+
+        const url = `http://192.168.200.133:8083/api/vacancies/filter?${queryParams.toString()}`;
+        console.log("Fetching vacancies with URL:", url);
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch filtered vacancies");
+        const data = await res.json();
+
+        // Handle API response structure
+        setVacancies(Array.isArray(data) ? data : data.content || []);
+      } catch (err) {
+        console.error("Error fetching filtered vacancies:", err);
+        setVacancies([]); // Clear on error
       } finally {
         setLoading(false);
       }
     };
 
-    fetchVacancies();
-  }, []);
+    fetchFilteredVacancies();
+  }, [
+    selectedCompanyId,
+    selectedCategoryId,
+    selectedEmploymentTypeId,
+    selectedJobModeId,
+    searchTerm,
+    currentPage, // 👈 make sure this is included
+  ]);
 
-  // Pagination logic
+  // Pagination logic with safe array check
+  const vacanciesArray = Array.isArray(vacancies) ? vacancies : [];
   const indexOfLastVacancy = currentPage * vacanciesPerPage;
   const indexOfFirstVacancy = indexOfLastVacancy - vacanciesPerPage;
-  const currentVacancies = vacancies.slice(
+  const currentVacancies = vacanciesArray.slice(
     indexOfFirstVacancy,
     indexOfLastVacancy
   );
-  const totalPages = Math.ceil(vacancies.length / vacanciesPerPage);
+  const totalPages = Math.ceil(vacanciesArray.length / vacanciesPerPage);
 
   return (
     <div className={styles.Home}>
@@ -100,6 +181,14 @@ export default function Home() {
             type="text"
             className={styles.SearchInput}
             placeholder="Vakansiya axtar..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setSelectedCompanyId("");
+              setSelectedCategoryId("");
+              setSelectedEmploymentTypeId("");
+              setSelectedJobModeId("");
+            }}
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
           />
@@ -111,56 +200,85 @@ export default function Home() {
             </ul>
           )}
         </div>
-        <button className={styles.SearchButton}>Axtar</button>
+        {/* You can remove this button if you want since filters are real-time */}
+        {/* <button className={styles.SearchButton} onClick={handleFilterSearch}>
+          Axtar
+        </button> */}
       </div>
 
+      {/* FILTERS */}
       <div className={styles.Filter}>
         <div className={styles.FilterList}>
           <div className={styles.FilterItem}>
             <label>Şirkət</label>
             <div className={styles.SelectWrapper}>
-              <select>
-                <option>STP MMC</option>
-                <option>STP GLOBAL CABLE</option>
-                <option>STP ALÜMİNİUM</option>
-                <option>STP-AH</option>
-                <option>ASSAN-STP PANEL</option>
-                <option>SOCAR-STP</option>
-                <option>STP POLİMER</option>
-                <option>STP METAL</option>
-                <option>AZROKSAN</option>
-                <option>STP-Btech</option>
+              <select
+                value={selectedCompanyId}
+                onChange={(e) => {
+                  setSelectedCompanyId(e.target.value);
+                  setSearchTerm("");
+                }}
+              >
+                <option value="">Şirkət seçin</option>
+                {companies.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.companyName}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
           <div className={styles.FilterItem}>
             <label>Kateqoriya</label>
             <div className={styles.SelectWrapper}>
-              <select>
-                <option>Komputerləşmə</option>
-                <option>Biznes və idarəetmə</option>
-                <option>Paylama və Logistika</option>
+              <select
+                value={selectedCategoryId}
+                onChange={(e) => {
+                  setSelectedCategoryId(e.target.value);
+                  setSearchTerm("");
+                }}
+              >
+                <option value="">Kateqoriya seçin</option>
+                {formOptions.categories.map((cat: any) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
           <div className={styles.FilterItem}>
             <label>İş növləri</label>
             <div className={styles.SelectWrapper}>
-              <select>
-                <option>Tam iş günü</option>
-                <option>Yarım iş günü</option>
-                <option>Təcrübə</option>
+              <select
+                value={selectedEmploymentTypeId}
+                onChange={(e) => {
+                  setSelectedEmploymentTypeId(e.target.value);
+                  setSearchTerm("");
+                }}
+              >
+                <option value="">İş növü seçin</option>
+                {formOptions.employmentTypes.map((type: any) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
           <div className={styles.FilterItem}>
             <label>İş imkanları</label>
             <div className={styles.SelectWrapper}>
-              <select>
-                <option>Filialda işləmək</option>
-                <option>Evdən İşləmək</option>
-                <option>Ofis işi</option>
-                <option>Təcrübə proqramları</option>
+              <select
+                value={selectedJobModeId}
+                onChange={(e) => setSelectedJobModeId(e.target.value)}
+              >
+                <option value="">İş imkanı seçin</option>
+                {formOptions.jobModes.map((mode: any) => (
+                  <option key={mode.id} value={mode.id}>
+                    {mode.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -179,7 +297,12 @@ export default function Home() {
           <p>No vacancies found.</p>
         ) : (
           currentVacancies.map((vacancy) => (
-            <div className={styles.VacancyListItems} key={vacancy.id}>
+            <div
+              key={vacancy.id}
+              className={styles.VacancyListItems}
+              onClick={() => navigate(`/vacancy/${vacancy.id}`)}
+              style={{ cursor: "pointer" }}
+            >
               <div className={styles.LogoInfo}>
                 <img
                   src={
@@ -195,7 +318,12 @@ export default function Home() {
                   <p>{vacancy.companyDto?.companyName || "Naməlum Şirkət"}</p>
                 </div>
               </div>
-              <Link to={`/vacancy/${vacancy.id}`} className={styles.Applylink}>
+
+              <Link
+                to={`/apply/${vacancy.id}`}
+                className={styles.Applylink}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className={styles.ApplyBtn}>
                   <h4>Müraciət et</h4>
                 </div>
