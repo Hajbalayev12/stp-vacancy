@@ -7,7 +7,7 @@ interface Company {
   companyName: string;
   companyLogoUrl: string;
   companyAddress: string;
-  vacancyCount: number;
+  activeVacancyCount: number;
 }
 
 export default function Companies() {
@@ -37,7 +37,7 @@ export default function Companies() {
               />
               <h2>{company.companyName}</h2>
               <p>{company.companyAddress}</p>
-              <button>Vakansiya sayı: {company.vacancyCount}</button>
+              <button>Vakansiya sayı: {company.activeVacancyCount}</button>
             </div>
           </Link>
         ))}

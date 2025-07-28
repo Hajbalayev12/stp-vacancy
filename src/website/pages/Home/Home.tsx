@@ -40,6 +40,13 @@ type Vacancy = {
   vacancyStatus: boolean;
 };
 
+type FormOptions = {
+  categories: { id: number; name: string }[];
+  employmentTypes: { id: number; name: string }[];
+  jobModes: { id: number; name: string }[];
+  companyDto: { id: number; companyName: string }[];
+};
+
 export default function Home() {
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,15 +54,12 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const vacanciesPerPage = 3;
 
-  const [formOptions, setFormOptions] = useState({
+  const [formOptions, setFormOptions] = useState<FormOptions>({
     categories: [],
     employmentTypes: [],
     jobModes: [],
+    companyDto: [],
   });
-
-  const [companies, setCompanies] = useState<
-    { id: number; companyName: string }[]
-  >([]);
 
   // Filters state
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
@@ -74,7 +78,6 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  // Fetch form options and companies on mount
   useEffect(() => {
     const fetchFormOptions = async () => {
       try {
@@ -86,29 +89,16 @@ export default function Home() {
           categories: data.categories || [],
           employmentTypes: data.employmentTypes || [],
           jobModes: data.jobModes || [],
+          companyDto: data.companyDto || [],
         });
       } catch (err) {
         console.error("Error fetching form options:", err);
       }
     };
 
-    const fetchCompanies = async () => {
-      try {
-        const res = await fetch(
-          "http://192.168.200.133:8081/api/companies/all/company"
-        );
-        const data = await res.json();
-        setCompanies(data || []);
-      } catch (err) {
-        console.error("Error fetching companies:", err);
-      }
-    };
-
     fetchFormOptions();
-    fetchCompanies();
   }, []);
 
-  // Fetch vacancies automatically when filters or searchTerm change
   useEffect(() => {
     const fetchFilteredVacancies = async () => {
       setLoading(true);
@@ -125,10 +115,9 @@ export default function Home() {
           queryParams.append("jobModeId", selectedJobModeId);
         if (searchTerm) queryParams.append("vacancyName", searchTerm);
 
-        // Add pagination
-        const size = 5; // or 10
+        // const size = 5;
         queryParams.append("pageNumber", currentPage.toString());
-        queryParams.append("size", size.toString());
+        // queryParams.append("size", size.toString());
 
         const url = `http://192.168.200.133:8083/api/vacancies/filter?${queryParams.toString()}`;
         console.log("Fetching vacancies with URL:", url);
@@ -137,11 +126,10 @@ export default function Home() {
         if (!res.ok) throw new Error("Failed to fetch filtered vacancies");
         const data = await res.json();
 
-        // Handle API response structure
         setVacancies(Array.isArray(data) ? data : data.content || []);
       } catch (err) {
         console.error("Error fetching filtered vacancies:", err);
-        setVacancies([]); // Clear on error
+        setVacancies([]);
       } finally {
         setLoading(false);
       }
@@ -154,10 +142,9 @@ export default function Home() {
     selectedEmploymentTypeId,
     selectedJobModeId,
     searchTerm,
-    currentPage, // 👈 make sure this is included
+    currentPage,
   ]);
 
-  // Pagination logic with safe array check
   const vacanciesArray = Array.isArray(vacancies) ? vacancies : [];
   const indexOfLastVacancy = currentPage * vacanciesPerPage;
   const indexOfFirstVacancy = indexOfLastVacancy - vacanciesPerPage;
@@ -200,10 +187,6 @@ export default function Home() {
             </ul>
           )}
         </div>
-        {/* You can remove this button if you want since filters are real-time */}
-        {/* <button className={styles.SearchButton} onClick={handleFilterSearch}>
-          Axtar
-        </button> */}
       </div>
 
       {/* FILTERS */}
@@ -220,7 +203,7 @@ export default function Home() {
                 }}
               >
                 <option value="">Şirkət seçin</option>
-                {companies.map((company) => (
+                {formOptions.companyDto.map((company) => (
                   <option key={company.id} value={company.id}>
                     {company.companyName}
                   </option>
@@ -239,7 +222,7 @@ export default function Home() {
                 }}
               >
                 <option value="">Kateqoriya seçin</option>
-                {formOptions.categories.map((cat: any) => (
+                {formOptions.categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
@@ -258,7 +241,7 @@ export default function Home() {
                 }}
               >
                 <option value="">İş növü seçin</option>
-                {formOptions.employmentTypes.map((type: any) => (
+                {formOptions.employmentTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.name}
                   </option>
@@ -274,7 +257,7 @@ export default function Home() {
                 onChange={(e) => setSelectedJobModeId(e.target.value)}
               >
                 <option value="">İş imkanı seçin</option>
-                {formOptions.jobModes.map((mode: any) => (
+                {formOptions.jobModes.map((mode) => (
                   <option key={mode.id} value={mode.id}>
                     {mode.name}
                   </option>
@@ -318,7 +301,6 @@ export default function Home() {
                   <p>{vacancy.companyDto?.companyName || "Naməlum Şirkət"}</p>
                 </div>
               </div>
-
               <Link
                 to={`/apply/${vacancy.id}`}
                 className={styles.Applylink}

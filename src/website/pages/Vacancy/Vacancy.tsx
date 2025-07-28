@@ -29,28 +29,31 @@ type Vacancy = {
     companyEmail: string;
     companyLogoUrl: string;
     totalEmployees: number;
-  };
-  employmentType: {
+  } | null;
+  employmentType?: {
     id: number;
     name: string;
   };
-  jobMode: {
+  jobMode?: {
     id: number;
     name: string;
   };
-  category: {
+  category?: {
     id: number;
     name: string;
   };
 };
 
 const VacancyInfo = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [vacancy, setVacancy] = useState<Vacancy | null>(null);
 
   useEffect(() => {
     fetch(`http://192.168.200.133:8083/api/vacancies/${id}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch vacancy");
+        return res.json();
+      })
       .then((data) => setVacancy(data))
       .catch((err) => console.error(err));
   }, [id]);
@@ -64,13 +67,22 @@ const VacancyInfo = () => {
         <div className={styles.left}>
           <div className={styles.headerCard}>
             <div className={styles.logo}>
-              <img src={vacancy.companyDto.companyLogoUrl} alt="Company logo" />
+              <img
+                src={
+                  vacancy.companyDto?.companyLogoUrl ||
+                  "src/website/assets/default_logo.png"
+                }
+                alt="Company logo"
+              />
             </div>
             <div>
               <h2 className={styles.position}>{vacancy.position}</h2>
-              <p className={styles.department}>{vacancy.category.name}</p>
+              <p className={styles.department}>
+                {vacancy.category?.name || "Naməlum kateqoriya"}
+              </p>
               <p className={styles.meta}>
-                <FaMapMarkerAlt /> {vacancy.companyDto.companyName}
+                <FaMapMarkerAlt />{" "}
+                {vacancy.companyDto?.companyName || "Naməlum şirkət"}
               </p>
               <p className={styles.date}>
                 Elanın yerləşdirilmə tarixi: {vacancy.createdDate}
@@ -81,41 +93,24 @@ const VacancyInfo = () => {
           <div className={styles.infoBlock}>
             <h3>Namizədə olan tələblər:</h3>
             <ul>
-              {vacancy.requirements.split("\n").map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
+              {vacancy.requirements
+                ? vacancy.requirements
+                    .split("\n")
+                    .map((item, i) => <li key={i}>{item}</li>)
+                : "Məlumat yoxdur."}
             </ul>
           </div>
 
           <div className={styles.infoBlock}>
             <h3>Ümumi vəzifə öhdəlikləri:</h3>
             <ul>
-              {vacancy.responsibilities.split("\n").map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
+              {vacancy.responsibilities
+                ? vacancy.responsibilities
+                    .split("\n")
+                    .map((item, i) => <li key={i}>{item}</li>)
+                : "Məlumat yoxdur."}
             </ul>
           </div>
-
-          {/* <div className={styles.extraImageSection}>
-            <h3>Əlavə Vizual Məlumat</h3>
-            <div className={styles.imageRow}>
-              <img
-                src="src/website/assets/image.png"
-                alt="Əlavə Şəkil"
-                className={styles.extraImage}
-              />
-              <img
-                src="src/website/assets/NDT.png"
-                alt="Əlavə Şəkil"
-                className={styles.extraImage}
-              />
-              <img
-                src="src/website/assets/NDT-Technician-Training.jpg"
-                alt="Əlavə Şəkil"
-                className={styles.extraImage}
-              />
-            </div>
-          </div> */}
         </div>
 
         {/* Sağ tərəf */}
@@ -157,22 +152,24 @@ const VacancyInfo = () => {
             <h4>Vakansiya detalları</h4>
             <ul>
               <li>
-                <strong>Məşğulluq növü:</strong> {vacancy.employmentType.name}
+                <strong>Məşğulluq növü:</strong>{" "}
+                {vacancy.employmentType?.name || "N/A"}
               </li>
               <li>
-                <strong>Təcrübə tələbi:</strong> {vacancy.experienceRequired}
+                <strong>Təcrübə tələbi:</strong>{" "}
+                {vacancy.experienceRequired || "N/A"}
               </li>
               <li>
-                <strong>Təhsil:</strong> {vacancy.educationLevel}
+                <strong>Təhsil:</strong> {vacancy.educationLevel || "N/A"}
               </li>
               <li>
-                <strong>Ixtisas:</strong> {vacancy.major}
+                <strong>Ixtisas:</strong> {vacancy.major || "N/A"}
               </li>
               <li>
-                <strong>Dil biliyi:</strong> {vacancy.language}
+                <strong>Dil biliyi:</strong> {vacancy.language || "N/A"}
               </li>
               <li>
-                <strong>Komputer bacarıqları:</strong> {vacancy.skills}
+                <strong>Komputer bacarıqları:</strong> {vacancy.skills || "N/A"}
               </li>
             </ul>
 

@@ -13,6 +13,11 @@ type Job = {
     name: string;
   };
   vacancyStatus: boolean;
+  companyDto: {
+    id: number;
+    companyName: string;
+    companyLogoUrl: string;
+  };
 };
 
 const ViewVacancies = () => {
@@ -65,6 +70,8 @@ const ViewVacancies = () => {
             <thead>
               <tr>
                 <th>No</th>
+                <th>Company Name</th>
+                <th>Company Logo</th>
                 <th>Position</th>
                 <th>Type</th>
                 <th>Created Date</th>
@@ -83,6 +90,22 @@ const ViewVacancies = () => {
                   style={{ cursor: "pointer" }}
                 >
                   <td>{index + 1}</td>
+                  <td>{job.companyDto?.companyName || "—"}</td>
+                  <td>
+                    {job.companyDto?.companyLogoUrl ? (
+                      <img
+                        src={job.companyDto.companyLogoUrl}
+                        alt={job.companyDto.companyName}
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "contain",
+                        }}
+                      />
+                    ) : (
+                      "—"
+                    )}
+                  </td>
                   <td>{job.position}</td>
                   <td>{job.employmentType?.name || "—"}</td>
                   <td>{formatDate(job.createdDate)}</td>

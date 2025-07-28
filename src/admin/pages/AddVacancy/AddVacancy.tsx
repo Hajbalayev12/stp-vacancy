@@ -5,7 +5,7 @@ import { useToast } from "../../../shared/context/ToastContext";
 type Company = {
   id: number;
   companyName: string;
-  companyLogoUrl: string;
+  companyLogoUrl?: string;
 };
 
 type Option = {
@@ -16,12 +16,16 @@ type Option = {
 const AddVacancy = () => {
   const { showError, showSuccess } = useToast();
 
+  // State for all form options
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [company, setCompany] = useState<Company | null>(null);
   const [categories, setCategories] = useState<Option[]>([]);
   const [employmentTypes, setEmploymentTypes] = useState<Option[]>([]);
   const [jobModes, setJobModes] = useState<Option[]>([]);
 
+  // Selected company for logo display
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+
+  // Form state
   const [formData, setFormData] = useState({
     companyId: 0,
     position: "",
@@ -40,62 +44,44 @@ const AddVacancy = () => {
     endDate: "",
   });
 
-  // Fetch all companies and form options on mount
+  // Fetch all form options (including companies) on mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [companiesRes, optionsRes] = await Promise.all([
-          fetch("http://192.168.200.133:8081/api/companies/all/company"),
-          fetch("http://192.168.200.133:8083/api/vacancies/form-options"),
-        ]);
-        if (!companiesRes.ok || !optionsRes.ok) {
-          throw new Error("Failed to fetch initial data");
-        }
-        const companiesData = await companiesRes.json();
-        const optionsData = await optionsRes.json();
-
-        setCompanies(companiesData);
-        setCategories(optionsData.categories || []);
-        setEmploymentTypes(optionsData.employmentTypes || []);
-        setJobModes(optionsData.jobModes || []);
-      } catch (err) {
-        console.error(err);
-        showError("Failed to load initial data");
-      }
-    };
-    fetchData();
-  }, [showError]);
-
-  // Fetch selected company info whenever companyId changes
-  useEffect(() => {
-    if (formData.companyId === 0) {
-      setCompany(null);
-      return;
-    }
-    const fetchCompany = async () => {
+    const fetchFormOptions = async () => {
       try {
         const res = await fetch(
-          `http://192.168.200.133:8081/api/companies/${formData.companyId}`
+          "http://192.168.200.133:8083/api/form-options/form-options"
         );
-        if (!res.ok) throw new Error("Failed to fetch company");
+        if (!res.ok) throw new Error("Failed to fetch form options");
+
         const data = await res.json();
-        setCompany(data);
+
+        setCompanies(data.companyDto || []);
+        setCategories(data.categories || []);
+        setEmploymentTypes(data.employmentTypes || []);
+        setJobModes(data.jobModes || []);
       } catch (err) {
         console.error(err);
-        showError("Failed to load company info");
-        setCompany(null);
+        showError("Failed to load form options");
       }
     };
-    fetchCompany();
-  }, [formData.companyId, showError]);
 
-  // Handle input/select changes
+    fetchFormOptions();
+  }, [showError]);
+
+  // Update selectedCompany whenever companyId or companies changes
+  useEffect(() => {
+    const company = companies.find((c) => c.id === formData.companyId) || null;
+    setSelectedCompany(company);
+  }, [formData.companyId, companies]);
+
+  // Handle changes in input/select fields
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: name.endsWith("Id") ? Number(value) : value,
@@ -119,7 +105,24 @@ const AddVacancy = () => {
 
       if (res.ok) {
         showSuccess("Vacancy created successfully!");
-        // Optionally reset formData here if needed
+        // Optionally reset form data here:
+        // setFormData({
+        //   companyId: 0,
+        //   position: "",
+        //   experienceRequired: "",
+        //   educationLevel: "",
+        //   major: "",
+        //   language: "",
+        //   skills: "",
+        //   requirements: "",
+        //   responsibilities: "",
+        //   createdByUserId: 1,
+        //   employmentTypeId: 0,
+        //   jobModeId: 0,
+        //   categoryId: 0,
+        //   startDate: "",
+        //   endDate: "",
+        // });
       } else {
         showError("Failed to create vacancy.");
       }
@@ -154,16 +157,16 @@ const AddVacancy = () => {
           </select>
         </div>
 
-        {company && (
+        {selectedCompany && (
           <div className={styles.companyInfo}>
-            {company.companyLogoUrl && (
+            {selectedCompany.companyLogoUrl && (
               <img
-                src={company.companyLogoUrl}
-                alt={`${company.companyName} Logo`}
+                src={selectedCompany.companyLogoUrl}
+                alt={`${selectedCompany.companyName} Logo`}
                 className={styles.companyLogo}
               />
             )}
-            <h3>{company.companyName}</h3>
+            <h3>{selectedCompany.companyName}</h3>
           </div>
         )}
       </div>
