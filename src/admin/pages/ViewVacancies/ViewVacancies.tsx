@@ -29,7 +29,7 @@ const ViewVacancies = () => {
     const fetchJobs = async () => {
       try {
         const res = await fetch(
-          "http://192.168.200.133:8083/api/vacancies/all/vacancy"
+          "http://192.168.200.133:8083/api/vacancies/all/vacancy?sort=createdDate,asc"
         );
         if (!res.ok) throw new Error("Failed to fetch vacancies");
         const data = await res.json();

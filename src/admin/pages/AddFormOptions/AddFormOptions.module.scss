@@ -1,0 +1,56 @@
+.AddFormOptions {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f7faff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    text-align: center;
+    color: #2d3a60;
+    margin-bottom: 2rem;
+  }
+
+  .optionSection {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #444;
+    }
+
+    input {
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      outline: none;
+
+      &:focus {
+        border-color: #407bff;
+      }
+    }
+  }
+  .submitBtn {
+    margin-top: 20px;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    align-self: center;
+    transition: background 0.3s;
+
+    &:hover {
+      background-color: #005bb5;
+    }
+  }
+}

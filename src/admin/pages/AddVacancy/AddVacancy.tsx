@@ -91,6 +91,10 @@ const AddVacancy = () => {
   // Submit form data
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const confirmed = window.confirm(
+      "Bu vakansiyanı yaratmaq istədiyinizə əminsinizmi?"
+    );
+    if (!confirmed) return;
     console.log("Form data to be sent:", formData);
 
     try {

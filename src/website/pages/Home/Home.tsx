@@ -35,9 +35,10 @@ type Vacancy = {
     companyLogoUrl?: string | null;
   } | null;
   category: {
+    id: number;
     name: string;
   };
-  vacancyStatus: boolean;
+  vacancyStatus?: boolean;
 };
 
 type FormOptions = {
@@ -52,6 +53,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState(false);
+
   const vacanciesPerPage = 3;
 
   const [formOptions, setFormOptions] = useState<FormOptions>({
@@ -61,7 +65,6 @@ export default function Home() {
     companyDto: [],
   });
 
-  // Filters state
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [selectedEmploymentTypeId, setSelectedEmploymentTypeId] = useState("");
@@ -78,12 +81,14 @@ export default function Home() {
 
   const navigate = useNavigate();
 
+  // Fetch form options on mount
   useEffect(() => {
     const fetchFormOptions = async () => {
       try {
         const res = await fetch(
           "http://192.168.200.133:8083/api/form-options/form-options"
         );
+        if (!res.ok) throw new Error("Failed to fetch form options");
         const data = await res.json();
         setFormOptions({
           categories: data.categories || [],
@@ -99,43 +104,55 @@ export default function Home() {
     fetchFormOptions();
   }, []);
 
+  // Fetch vacancies when filters or page changes
   useEffect(() => {
-    const fetchFilteredVacancies = async () => {
-      setLoading(true);
-      try {
-        const queryParams = new URLSearchParams();
+    const delayDebounce = setTimeout(() => {
+      const fetchFilteredVacancies = async () => {
+        setLoading(true);
+        try {
+          const queryParams = new URLSearchParams();
 
-        if (selectedCompanyId)
-          queryParams.append("companyId", selectedCompanyId);
-        if (selectedCategoryId)
-          queryParams.append("categoryId", selectedCategoryId);
-        if (selectedEmploymentTypeId)
-          queryParams.append("employmentTypeId", selectedEmploymentTypeId);
-        if (selectedJobModeId)
-          queryParams.append("jobModeId", selectedJobModeId);
-        if (searchTerm) queryParams.append("vacancyName", searchTerm);
+          if (selectedCompanyId)
+            queryParams.append("companyId", selectedCompanyId);
+          if (selectedCategoryId)
+            queryParams.append("categoryId", selectedCategoryId);
+          if (selectedEmploymentTypeId)
+            queryParams.append("employmentTypeId", selectedEmploymentTypeId);
+          if (selectedJobModeId)
+            queryParams.append("jobModeId", selectedJobModeId);
+          if (searchTerm) queryParams.append("vacancyName", searchTerm);
 
-        // const size = 5;
-        queryParams.append("pageNumber", currentPage.toString());
-        // queryParams.append("size", size.toString());
+          // Backend expects page index starting from 0
+          queryParams.append("page", (currentPage - 1).toString());
+          queryParams.append("size", vacanciesPerPage.toString());
 
-        const url = `http://192.168.200.133:8083/api/vacancies/filter?${queryParams.toString()}`;
-        console.log("Fetching vacancies with URL:", url);
+          const url = `http://192.168.200.133:8083/api/vacancies/filter?${queryParams.toString()}&sort=id,desc`;
 
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Failed to fetch filtered vacancies");
-        const data = await res.json();
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Failed to fetch filtered vacancies");
+          const data = await res.json();
 
-        setVacancies(Array.isArray(data) ? data : data.content || []);
-      } catch (err) {
-        console.error("Error fetching filtered vacancies:", err);
-        setVacancies([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+          setVacancies(data.content || []);
 
-    fetchFilteredVacancies();
+          const totalItems = data.totalElements ?? data.content?.length ?? 0;
+          const computedPages = Math.ceil(totalItems / vacanciesPerPage);
+          setTotalPages(computedPages > 0 ? computedPages : 1);
+
+          setError(false);
+        } catch (err) {
+          console.error("Error fetching filtered vacancies:", err);
+          setVacancies([]);
+          setError(true);
+          setTotalPages(1);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFilteredVacancies();
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
   }, [
     selectedCompanyId,
     selectedCategoryId,
@@ -144,15 +161,6 @@ export default function Home() {
     searchTerm,
     currentPage,
   ]);
-
-  const vacanciesArray = Array.isArray(vacancies) ? vacancies : [];
-  const indexOfLastVacancy = currentPage * vacanciesPerPage;
-  const indexOfFirstVacancy = indexOfLastVacancy - vacanciesPerPage;
-  const currentVacancies = vacanciesArray.slice(
-    indexOfFirstVacancy,
-    indexOfLastVacancy
-  );
-  const totalPages = Math.ceil(vacanciesArray.length / vacanciesPerPage);
 
   return (
     <div className={styles.Home}>
@@ -175,6 +183,7 @@ export default function Home() {
               setSelectedCategoryId("");
               setSelectedEmploymentTypeId("");
               setSelectedJobModeId("");
+              setCurrentPage(1);
             }}
             onFocus={() => setShowSuggestions(true)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
@@ -182,14 +191,23 @@ export default function Home() {
           {showSuggestions && (
             <ul className={styles.Suggestions}>
               {popularVacancies.map((vacancy, index) => (
-                <li key={index}>{vacancy}</li>
+                <li
+                  key={index}
+                  onClick={() => {
+                    setSearchTerm(vacancy);
+                    setShowSuggestions(false);
+                    setCurrentPage(1);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  {vacancy}
+                </li>
               ))}
             </ul>
           )}
         </div>
       </div>
 
-      {/* FILTERS */}
       <div className={styles.Filter}>
         <div className={styles.FilterList}>
           <div className={styles.FilterItem}>
@@ -200,6 +218,7 @@ export default function Home() {
                 onChange={(e) => {
                   setSelectedCompanyId(e.target.value);
                   setSearchTerm("");
+                  setCurrentPage(1);
                 }}
               >
                 <option value="">Şirkət seçin</option>
@@ -219,6 +238,7 @@ export default function Home() {
                 onChange={(e) => {
                   setSelectedCategoryId(e.target.value);
                   setSearchTerm("");
+                  setCurrentPage(1);
                 }}
               >
                 <option value="">Kateqoriya seçin</option>
@@ -238,6 +258,7 @@ export default function Home() {
                 onChange={(e) => {
                   setSelectedEmploymentTypeId(e.target.value);
                   setSearchTerm("");
+                  setCurrentPage(1);
                 }}
               >
                 <option value="">İş növü seçin</option>
@@ -254,7 +275,11 @@ export default function Home() {
             <div className={styles.SelectWrapper}>
               <select
                 value={selectedJobModeId}
-                onChange={(e) => setSelectedJobModeId(e.target.value)}
+                onChange={(e) => {
+                  setSelectedJobModeId(e.target.value);
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
               >
                 <option value="">İş imkanı seçin</option>
                 {formOptions.jobModes.map((mode) => (
@@ -276,10 +301,14 @@ export default function Home() {
       <div className={styles.VacancyList}>
         {loading ? (
           <p>Loading vacancies...</p>
-        ) : currentVacancies.length === 0 ? (
-          <p>No vacancies found.</p>
+        ) : vacancies.length === 0 ? (
+          <p>
+            {error
+              ? "Vakansiya tapılmadı və ya server cavab vermir."
+              : "Heç bir vakansiya tapılmadı."}
+          </p>
         ) : (
-          currentVacancies.map((vacancy) => (
+          vacancies.map((vacancy) => (
             <div
               key={vacancy.id}
               className={styles.VacancyListItems}

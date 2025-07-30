@@ -41,6 +41,14 @@ export default function Sidebar() {
         { label: "View Vacancies", path: "/admin/viewvacancies" },
       ],
     },
+    {
+      icon: <FaUser />,
+      label: "Form Options",
+      subItems: [
+        { label: "➕ Add Form Options", path: "/admin/addformoptions" },
+        { label: "View Form Options", path: "/admin/viewformoptions" },
+      ],
+    },
   ];
 
   const toggleSubMenu = (index: number) => {

@@ -113,6 +113,11 @@ export default function AddCompany() {
 
     if (!validateForm()) return;
 
+    const confirmed = window.confirm(
+      "Bu şirkəti yaratmaq istədiyinizə əminsiniz?"
+    );
+    if (!confirmed) return;
+
     const companyDto = {
       companyName,
       companyAddress: location,
@@ -124,8 +129,12 @@ export default function AddCompany() {
     };
 
     const formData = new FormData();
-    formData.append("photo", logo!);
+    formData.append("file", logo!);
 
+    fetch("https://fff.runasp.net/api/Test/Echo", {
+      method: "POST",
+      body: formData,
+    });
     const companyBlob = new Blob([JSON.stringify(companyDto)], {
       type: "application/json",
     });
@@ -133,7 +142,8 @@ export default function AddCompany() {
 
     try {
       const response = await fetch(
-        "http://192.168.200.133:8081/api/companies/add/company",
+        "http://192.168.200.133:8083/api/vacancies/create",
+        // "http://ssss.runasp.net/api/Companies/Create",
         {
           method: "POST",
           body: formData,
