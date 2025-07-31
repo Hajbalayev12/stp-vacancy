@@ -11,6 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Signin.module.scss";
 import { useToast } from "../../../shared/context/ToastContext";
+import { API_USERS } from "../../../constants/apiBase";
 
 interface FormErrors {
   [key: string]: string | undefined;
@@ -61,14 +62,11 @@ export default function Signin() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "http://192.168.200.133:8082/api/users/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${API_USERS}/api/users/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const contentType = response.headers.get("content-type");
       const isJson = contentType && contentType.includes("application/json");

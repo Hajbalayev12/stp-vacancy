@@ -1,6 +1,7 @@
 import styles from "./ViewVacancies.module.scss";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 type Job = {
   id?: number;
@@ -29,7 +30,7 @@ const ViewVacancies = () => {
     const fetchJobs = async () => {
       try {
         const res = await fetch(
-          "http://192.168.200.133:8083/api/vacancies/all/vacancy?sort=createdDate,asc"
+          `${API_VACANCIES}/api/vacancies/all/vacancy?sort=createdDate,asc`
         );
         if (!res.ok) throw new Error("Failed to fetch vacancies");
         const data = await res.json();

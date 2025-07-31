@@ -14,6 +14,7 @@ import {
   FaEyeSlash,
 } from "react-icons/fa";
 import { useToast } from "../../../shared/context/ToastContext";
+import { API_USERS } from "../../../constants/apiBase";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -121,14 +122,11 @@ export default function Signup() {
     };
 
     try {
-      const response = await fetch(
-        "http://192.168.200.133:8082/api/users/register",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${API_USERS}/api/users/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         let errorData = null;

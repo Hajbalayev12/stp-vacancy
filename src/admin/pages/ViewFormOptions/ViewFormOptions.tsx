@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./ViewFormOptions.module.scss"; // create this file for styling if needed
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 type Category = { id: number; name: string };
 type EmploymentType = { id: number; name: string };
@@ -24,7 +25,7 @@ export default function ViewFormOptions() {
     const fetchFormOptions = async () => {
       try {
         const res = await fetch(
-          "http://192.168.200.133:8083/api/form-options/form-options"
+          `${API_VACANCIES}/api/form-options/form-options`
         );
         const data = await res.json();
         setFormOptions({

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import styles from "./CompanyInfo.module.scss";
 import { FaMapMarkerAlt, FaEnvelope, FaPhone, FaUsers } from "react-icons/fa";
 import { useToast } from "../../../shared/context/ToastContext";
+import { API_COMPANIES } from "../../../constants/apiBase";
 
 interface TeamMember {
   name: string;
@@ -54,7 +55,7 @@ const CompanyInfo = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>("");
 
-  const API_BASE_URL = "http://192.168.200.133:8081/api/companies";
+  const API_BASE_URL = `${API_COMPANIES}/api/companies`;
   const { showError, showSuccess } = useToast();
 
   useEffect(() => {

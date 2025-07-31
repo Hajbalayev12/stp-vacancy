@@ -7,6 +7,7 @@ import {
   FaTwitter,
   FaLinkedinIn,
 } from "react-icons/fa";
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 type Vacancy = {
   id: number;
@@ -49,7 +50,7 @@ const VacancyInfo = () => {
   const [vacancy, setVacancy] = useState<Vacancy | null>(null);
 
   useEffect(() => {
-    fetch(`http://192.168.200.133:8083/api/vacancies/${id}`)
+    fetch(`${API_VACANCIES}/api/vacancies/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch vacancy");
         return res.json();

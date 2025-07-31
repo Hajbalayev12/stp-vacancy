@@ -1,6 +1,32 @@
 import { useState, useEffect } from "react";
 import styles from "./Company.module.scss";
 import { Link, useParams } from "react-router-dom";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+import { styled } from "@mui/material/styles";
+import { API_COMPANIES } from "../../../constants/apiBase";
+import { API_VACANCIES } from "../../../constants/apiBase";
+
+const StyledPagination = styled(Pagination)(() => ({
+  "& .MuiPaginationItem-root": {
+    color: "#407bff",
+    borderColor: "#407bff",
+    backgroundColor: "white",
+    "&:hover": {
+      backgroundColor: "#407bff",
+      color: "white",
+    },
+  },
+  "& .MuiPaginationItem-root.Mui-selected": {
+    backgroundColor: "#407bff",
+    color: "white",
+    borderColor: "#407bff",
+    "&:hover": {
+      backgroundColor: "#407bff",
+      color: "white",
+    },
+  },
+}));
 
 interface TeamMember {
   name: string;
@@ -31,10 +57,22 @@ interface Vacancy {
   };
 }
 
+interface VacancyResponse {
+  content: Vacancy[];
+  totalPages: number;
+  totalElements: number;
+  number: number;
+  size: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
 const getFullImageUrl = (url?: string) => {
   if (!url) return "/assets/default_logo.png";
   if (url.startsWith("http") || url.startsWith("https")) return url;
-  return `http://192.168.200.133:8083/${url}`;
+  return `${API_VACANCIES}/${url}`;
 };
 
 export default function Company() {
@@ -46,12 +84,16 @@ export default function Company() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const size = 3;
 
   useEffect(() => {
     if (!id) return;
 
-    // Şirkət məlumatını çək
-    fetch(`http://192.168.200.133:8081/api/companies/${id}`)
+    // Şirkət məlumatı
+    fetch(`${API_COMPANIES}/api/companies/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Məlumat alınmadı");
         return res.json();
@@ -61,19 +103,31 @@ export default function Company() {
         console.error("Error fetching company data:", err);
         setError("Şirkət tapılmadı.");
       });
+  }, [id]);
 
-    // Aktiv vakansiyaları çək
-    fetch(`http://192.168.200.133:8083/api/vacancies/active/company/${id}`)
+  useEffect(() => {
+    if (!id) return;
+
+    setLoading(true);
+
+    fetch(
+      `${API_VACANCIES}/api/vacancies/active/company/${id}?page=${
+        currentPage - 1
+      }&size=${size}`
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Vakansiyalar alınmadı");
         return res.json();
       })
-      .then((data) => setVacancies(data))
+      .then((data: VacancyResponse) => {
+        setVacancies(data.content);
+        setTotalPages(data.totalPages || 1);
+      })
       .catch((err) => {
         console.error("Error fetching vacancies:", err);
       })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, currentPage]);
 
   if (loading) return <div className={styles.Company}>Yüklənir...</div>;
   if (error) return <div className={styles.Company}>{error}</div>;
@@ -123,32 +177,51 @@ export default function Company() {
         {activeTab === "vacancies" ? (
           <div className={styles.VacancyList}>
             {vacancies.length > 0 ? (
-              vacancies.map((vacancy) => (
-                <div key={vacancy.id} className={styles.VacancyListItems}>
-                  <div className={styles.LogoInfo}>
-                    <img
-                      src={getFullImageUrl(vacancy.companyDto?.companyLogoUrl)}
-                      alt={vacancy.companyDto?.companyName || "Company Logo"}
-                      className={styles.VacancyLogo}
-                    />
-                    <div className={styles.VacancyInfo}>
-                      <h3>{vacancy.position || "Vakansiya"}</h3>
-                      <p>
-                        {vacancy.companyDto?.companyName ||
-                          "The Power of Tomorrow"}
-                      </p>
+              <>
+                {vacancies.map((vacancy) => (
+                  <div key={vacancy.id} className={styles.VacancyListItems}>
+                    <div className={styles.LogoInfo}>
+                      <img
+                        src={getFullImageUrl(
+                          vacancy.companyDto?.companyLogoUrl
+                        )}
+                        alt={vacancy.companyDto?.companyName || "Company Logo"}
+                        className={styles.VacancyLogo}
+                      />
+                      <div className={styles.VacancyInfo}>
+                        <h3>{vacancy.position || "Vakansiya"}</h3>
+                        <p>
+                          {vacancy.companyDto?.companyName ||
+                            "The Power of Tomorrow"}
+                        </p>
+                      </div>
                     </div>
+                    <Link
+                      to={`/vacancy/${vacancy.id}`}
+                      className={styles.Applylink}
+                    >
+                      <div className={styles.ApplyBtn}>
+                        <h4>Müraciət et</h4>
+                      </div>
+                    </Link>
                   </div>
-                  <Link
-                    to={`/vacancy/${vacancy.id}`}
-                    className={styles.Applylink}
-                  >
-                    <div className={styles.ApplyBtn}>
-                      <h4>Müraciət et</h4>
-                    </div>
-                  </Link>
+                ))}
+
+                {/* MUI Pagination */}
+                <div className={styles.Pagination}>
+                  <Stack spacing={2} alignItems="center">
+                    <StyledPagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={(_, value) => setCurrentPage(value)}
+                      showFirstButton
+                      showLastButton
+                      variant="outlined"
+                      shape="rounded"
+                    />
+                  </Stack>
                 </div>
-              ))
+              </>
             ) : (
               <p style={{ textAlign: "center", marginTop: "1rem" }}>
                 Bu şirkətdə aktiv vakansiya yoxdur.

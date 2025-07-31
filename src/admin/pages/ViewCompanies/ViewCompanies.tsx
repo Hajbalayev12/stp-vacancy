@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./Viewcompanies.module.scss";
 import { Link } from "react-router-dom";
+import { API_COMPANIES } from "../../../constants/apiBase";
 
 interface Company {
   id: number;
@@ -20,7 +21,7 @@ const Viewcompanies = () => {
     const fetchCompanies = async () => {
       try {
         const response = await fetch(
-          "http://192.168.200.133:8081/api/companies/all/company"
+          `${API_COMPANIES}/api/companies/all/company`
         );
 
         if (!response.ok) {

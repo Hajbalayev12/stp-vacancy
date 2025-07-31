@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./AddFormOptions.module.scss";
 import { useToast } from "../../../shared/context/ToastContext";
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 const AddFormOptions = () => {
   const [category, setCategory] = useState("");
@@ -19,10 +20,10 @@ const AddFormOptions = () => {
     }
 
     const urlMap = {
-      category: "http://192.168.200.133:8083/api/form-options/add/category",
+      category: `${API_VACANCIES}/api/form-options/add/category`,
       employmentType:
-        "http://192.168.200.133:8083/api/form-options/add/employment-type",
-      jobMode: "http://192.168.200.133:8083/api/form-options/add/job-mode",
+        `${API_VACANCIES}/api/form-options/add/employment-type`,
+      jobMode: `${API_VACANCIES}/api/form-options/add/job-mode`,
     };
 
     const url = `${urlMap[type]}?name=${value.trim()}`;

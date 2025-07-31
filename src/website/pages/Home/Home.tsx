@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 const StyledPagination = styled(Pagination)(() => ({
   "& .MuiPaginationItem-root": {
@@ -56,7 +57,7 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(false);
 
-  const vacanciesPerPage = 3;
+  const vacanciesPerPage = 4;
 
   const [formOptions, setFormOptions] = useState<FormOptions>({
     categories: [],
@@ -86,7 +87,7 @@ export default function Home() {
     const fetchFormOptions = async () => {
       try {
         const res = await fetch(
-          "http://192.168.200.133:8083/api/form-options/form-options"
+          `${API_VACANCIES}/api/form-options/form-options`
         );
         if (!res.ok) throw new Error("Failed to fetch form options");
         const data = await res.json();
@@ -126,7 +127,7 @@ export default function Home() {
           queryParams.append("page", (currentPage - 1).toString());
           queryParams.append("size", vacanciesPerPage.toString());
 
-          const url = `http://192.168.200.133:8083/api/vacancies/filter?${queryParams.toString()}&sort=id,desc`;
+          const url = `${API_VACANCIES}/api/vacancies/filter?${queryParams.toString()}&sort=id,desc`;
 
           const res = await fetch(url);
           if (!res.ok) throw new Error("Failed to fetch filtered vacancies");

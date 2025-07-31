@@ -1,6 +1,7 @@
 import styles from "./AddVacancy.module.scss";
 import { useState, useEffect } from "react";
 import { useToast } from "../../../shared/context/ToastContext";
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 type Company = {
   id: number;
@@ -49,7 +50,7 @@ const AddVacancy = () => {
     const fetchFormOptions = async () => {
       try {
         const res = await fetch(
-          "http://192.168.200.133:8083/api/form-options/form-options"
+          `${API_VACANCIES}/api/form-options/form-options`
         );
         if (!res.ok) throw new Error("Failed to fetch form options");
 

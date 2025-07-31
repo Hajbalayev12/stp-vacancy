@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import styles from "./AddCompany.module.scss";
 import { LuBuilding2 } from "react-icons/lu";
-import { useToast } from "../../../shared/context/ToastContext"; // Adjust path if needed
+import { useToast } from "../../../shared/context/ToastContext";
+import { API_COMPANIES } from "../../../constants/apiBase";
 
 export default function AddCompany() {
   const [companyName, setCompanyName] = useState("");
@@ -37,7 +38,7 @@ export default function AddCompany() {
       showError(
         "Yalnız JPG, JPEG, PNG, SVG, GIF və WEBP formatlı şəkillər qəbul olunur."
       );
-      e.target.value = ""; // Clear invalid file input
+      e.target.value = "";
       setLogo(null);
       return;
     }
@@ -129,12 +130,8 @@ export default function AddCompany() {
     };
 
     const formData = new FormData();
-    formData.append("file", logo!);
+    formData.append("photo", logo!);
 
-    fetch("https://fff.runasp.net/api/Test/Echo", {
-      method: "POST",
-      body: formData,
-    });
     const companyBlob = new Blob([JSON.stringify(companyDto)], {
       type: "application/json",
     });
@@ -142,8 +139,7 @@ export default function AddCompany() {
 
     try {
       const response = await fetch(
-        "http://192.168.200.133:8083/api/vacancies/create",
-        // "http://ssss.runasp.net/api/Companies/Create",
+        `${API_COMPANIES}/api/companies/add/company`,
         {
           method: "POST",
           body: formData,

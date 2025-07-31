@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 type Vacancy = {
   id: number;
@@ -53,9 +54,7 @@ const Vacancyinfo = () => {
   useEffect(() => {
     const fetchVacancy = async () => {
       try {
-        const res = await fetch(
-          `http://192.168.200.133:8083/api/vacancies/${vacancyId}`
-        );
+        const res = await fetch(`${API_VACANCIES}/api/vacancies/${vacancyId}`);
         if (!res.ok) throw new Error("Failed to fetch vacancy");
         const data: Vacancy = await res.json();
         setVacancy(data);

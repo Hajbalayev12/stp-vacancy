@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Companies.module.scss";
+import { API_COMPANIES } from "../../../constants/apiBase";
 
 interface Company {
   id: number;
@@ -15,7 +16,7 @@ export default function Companies() {
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    fetch("http://192.168.200.133:8081/api/companies/all/company")
+    fetch(`${API_COMPANIES}/api/companies/all/company`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
