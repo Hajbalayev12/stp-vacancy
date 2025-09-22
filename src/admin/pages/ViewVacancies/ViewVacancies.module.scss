@@ -91,4 +91,17 @@
       }
     }
   }
+  .Pagination {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+
+    // Responsive adjustments (optional)
+    @media (max-width: 600px) {
+      .MuiPagination-ul {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  }
 }

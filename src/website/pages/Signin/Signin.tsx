@@ -92,8 +92,6 @@ export default function Signin() {
         }
 
         setErrors(extractedErrors);
-
-        // Show toast for each error
         Object.values(extractedErrors).forEach((msg) => {
           if (msg) showError(msg);
         });
@@ -101,13 +99,16 @@ export default function Signin() {
         return;
       }
 
-      showSuccess("Uğurla daxil oldunuz!");
-
-      // Update localStorage and notify other components
+      // ✅ Save tokens
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       localStorage.setItem("isLoggedIn", "true");
+
+      // Notify other components (optional)
       window.dispatchEvent(new Event("loginStatusChanged"));
 
-      navigate("/");
+      showSuccess("Uğurla daxil oldunuz!");
+      navigate("/"); // go to homepage
     } catch (err) {
       showError("Server xətası baş verdi.");
       console.error(err);

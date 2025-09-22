@@ -11,6 +11,7 @@ import Profile from "./pages/Profile/Profile";
 import Vacancy from "./pages/Vacancy/Vacancy";
 import Tomorrow from "./pages/Tomorrow/Tomorrow";
 import Zerif from "./pages/Zerif/Zerif";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 
 const WebsiteRoutes = () => {
   return (
@@ -19,6 +20,7 @@ const WebsiteRoutes = () => {
       <Route path="/signin" element={<Signin />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/resetpassword" element={<ResetPassword />} />
 
       {/* Pages with WebsiteLayout */}
       <Route path="/" element={<WebsiteLayout />}>

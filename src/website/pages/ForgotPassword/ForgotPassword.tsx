@@ -1,19 +1,50 @@
 import { useState } from "react";
 import { FaEnvelope, FaUsers, FaClock, FaUserFriends } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { API_USERS } from "../../../constants/apiBase";
 import styles from "./ForgotPassword.module.scss";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (email.trim() === "") {
       setError(true);
-    } else {
-      setError(false);
-      console.log("Şifrə sıfırlama emaili göndərildi:", email);
+      return;
+    }
+
+    setError(false);
+    setLoading(true);
+
+    try {
+      const encodedEmail = encodeURIComponent(email);
+      const response = await fetch(
+        `${API_USERS}/api/users/password-reset-request?email=${encodedEmail}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "*/*",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Xəta baş verdi. Yenidən cəhd edin.");
+      }
+
+      // uğurlu cavab → success state true olur
+      setSuccess(true);
+      setEmail("");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,31 +86,42 @@ export default function ForgotPassword() {
           <img src="src/website/assets/stpmmc.png" alt="STP MMC Logo" />
           <h1>Şifrəni yeniləyin</h1>
         </div>
-        <form onSubmit={handleSubmit}>
-          <label>Email adresiniz</label>
-          <div
-            className={`${styles.inputGroup} ${
-              error ? styles.errorBorder : ""
-            }`}
-          >
-            <FaEnvelope />
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError(false);
-              }}
-              placeholder="info@stp.az"
-            />
-          </div>
-          {error && (
-            <span className={styles.errorText}>Bu bölmə doldurulmalıdır</span>
-          )}
 
-          <button type="submit">Şifrəni Dəyişin</button>
-        </form>
+        {!success ? (
+          <form onSubmit={handleSubmit}>
+            <label>Email adresiniz</label>
+            <div
+              className={`${styles.inputGroup} ${
+                error ? styles.errorBorder : ""
+              }`}
+            >
+              <FaEnvelope />
+              <input
+                type="email"
+                name="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError(false);
+                }}
+                placeholder="info@stp.az"
+                disabled={loading}
+              />
+            </div>
+            {error && (
+              <span className={styles.errorText}>Bu bölmə doldurulmalıdır</span>
+            )}
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Göndərilir..." : "Şifrəni Dəyişin"}
+            </button>
+          </form>
+        ) : (
+          <div className={styles.successMessage}>
+            <div className={styles.checkIcon}>✓</div>
+            <p>Zəhmət olmasa elektron poçtunuzu yoxlayın</p>
+          </div>
+        )}
 
         <div className={styles.signupLink}>
           <p>

@@ -23,6 +23,9 @@ type Vacancy = {
   startDate: string;
   endDate: string;
   vacancyStatus: boolean;
+  salaryNegotiable: boolean;
+  minSalary: number;
+  maxSalary: number;
   companyDto: {
     companyName: string;
     companyAddress: string;
@@ -171,6 +174,12 @@ const VacancyInfo = () => {
               </li>
               <li>
                 <strong>Komputer bacarıqları:</strong> {vacancy.skills || "N/A"}
+              </li>
+              <li>
+                <strong>Maaş:</strong>{" "}
+                {vacancy.salaryNegotiable
+                  ? "Razılaşma yolu ilə"
+                  : `${vacancy.minSalary} – ${vacancy.maxSalary} AZN`}
               </li>
             </ul>
 
