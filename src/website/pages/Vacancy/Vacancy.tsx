@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import styles from "./Vacancy.module.scss";
 import {
   FaMapMarkerAlt,
@@ -7,7 +7,10 @@ import {
   FaTwitter,
   FaLinkedinIn,
 } from "react-icons/fa";
-import { API_VACANCIES } from "../../../constants/apiBase";
+import { API_VACANCIES, API_APPLY } from "../../../constants/apiBase";
+import { jwtDecode } from "jwt-decode";
+import { useToast } from "../../../shared/context/ToastContext";
+import { apiRequest } from "../../../shared/utils/apiRequest";
 
 type Vacancy = {
   id: number;
@@ -26,48 +29,124 @@ type Vacancy = {
   salaryNegotiable: boolean;
   minSalary: number;
   maxSalary: number;
-  companyDto: {
+  companyDto?: {
     companyName: string;
     companyAddress: string;
     companyPhoneNumber: string;
     companyEmail: string;
     companyLogoUrl: string;
     totalEmployees: number;
-  } | null;
-  employmentType?: {
-    id: number;
-    name: string;
   };
-  jobMode?: {
-    id: number;
-    name: string;
-  };
-  category?: {
-    id: number;
-    name: string;
-  };
+  employmentType?: { id: number; name: string };
+  jobMode?: { id: number; name: string };
+  category?: { id: number; name: string };
 };
 
 const VacancyInfo = () => {
   const { id } = useParams<{ id: string }>();
   const [vacancy, setVacancy] = useState<Vacancy | null>(null);
+  const [appliedVacancies, setAppliedVacancies] = useState<number[]>([]);
+  const [isApplying, setIsApplying] = useState(false);
+  const toast = useToast();
 
+  const vacancyIdNumber = Number(id);
+
+  const getToken = () => localStorage.getItem("accessToken");
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("accessToken");
+    toast.showError("Sessiyanız bitib, zəhmət olmasa yenidən daxil olun.");
+  }, [toast]);
+
+  /** Fetch vacancy details (public) **/
   useEffect(() => {
-    fetch(`${API_VACANCIES}/api/vacancies/${id}`)
-      .then((res) => {
+    if (!id) return;
+
+    const fetchVacancy = async () => {
+      try {
+        const res = await fetch(`${API_VACANCIES}/api/vacancies/${id}`);
         if (!res.ok) throw new Error("Failed to fetch vacancy");
-        return res.json();
-      })
-      .then((data) => setVacancy(data))
-      .catch((err) => console.error(err));
+        const data = await res.json();
+        setVacancy(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchVacancy();
   }, [id]);
+
+  /** Fetch applied vacancies (only if logged in) **/
+  useEffect(() => {
+    const fetchAppliedVacancies = async () => {
+      const token = getToken();
+      if (!token) return; // <-- skip if not logged in
+
+      try {
+        const decoded: { sub: string; exp: number } = (jwtDecode as any)(token);
+        const userId = Number(decoded.sub);
+        const now = Math.floor(Date.now() / 1000);
+        if (!userId || (decoded.exp && decoded.exp < now)) {
+          handleLogout();
+          return;
+        }
+
+        const data: any[] = await apiRequest(
+          `${API_APPLY}/api/applications?userId=${userId}`
+        );
+
+        const ids = Array.isArray(data)
+          ? data
+              .map((app: any) => Number(app.vacancyDetails?.id))
+              .filter((id) => !isNaN(id))
+          : [];
+
+        setAppliedVacancies(ids);
+      } catch (err) {
+        console.error("Error loading applied vacancies:", err);
+      }
+    };
+
+    fetchAppliedVacancies();
+  }, [handleLogout]);
+
+  /** Handle Apply button click **/
+  const handleApply = async () => {
+    const token = getToken();
+    if (!token) {
+      toast.showError("Zəhmət olmasa əvvəlcə daxil olun.");
+      return;
+    }
+
+    if (appliedVacancies.includes(vacancyIdNumber)) {
+      toast.showError("Siz artıq bu vakansiyaya müraciət etmisiniz.");
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      await apiRequest(`${API_APPLY}/api/applications?vacancyId=${id}`, {
+        method: "POST",
+      });
+
+      setAppliedVacancies((prev) => [...prev, vacancyIdNumber]);
+      toast.showSuccess("Uğurla müraciət etdiniz!");
+    } catch (err) {
+      console.error(err);
+      toast.showError(
+        "Müraciət zamanı xəta baş verdi. Zəhmət olmasa yenidən cəhd edin."
+      );
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   if (!vacancy) return <div>Loading...</div>;
 
   return (
     <div className={styles.VacancyInfo}>
       <div className={styles.content}>
-        {/* Sol tərəf */}
+        {/* Left section */}
         <div className={styles.left}>
           <div className={styles.headerCard}>
             <div className={styles.logo}>
@@ -117,7 +196,7 @@ const VacancyInfo = () => {
           </div>
         </div>
 
-        {/* Sağ tərəf */}
+        {/* Right section */}
         <div className={styles.right}>
           <div className={styles.shareWrapper}>
             <div className={styles.shareButton}>
@@ -184,9 +263,23 @@ const VacancyInfo = () => {
             </ul>
 
             <div className={styles.buttonWrapper}>
-              <Link to="/signup" className={styles.link}>
-                <button className={styles.applyBtn}>Müraciət Et</button>
-              </Link>
+              {appliedVacancies.includes(vacancyIdNumber) ? (
+                <button
+                  className={styles.applyBtn}
+                  style={{ cursor: "not-allowed" }}
+                  disabled
+                >
+                  MÜRACİƏT OLUNUB
+                </button>
+              ) : (
+                <button
+                  onClick={handleApply}
+                  className={styles.applyBtn}
+                  disabled={isApplying}
+                >
+                  {isApplying ? "Göndərilir..." : "MÜRACİƏT ET"}
+                </button>
+              )}
             </div>
           </div>
         </div>

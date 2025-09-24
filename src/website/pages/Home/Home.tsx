@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
-import { API_VACANCIES, API_APPLY } from "../../../constants/apiBase";
+import { API_VACANCIES } from "../../../constants/apiBase";
 
 const StyledPagination = styled(Pagination)(() => ({
   "& .MuiPaginationItem-root": {
@@ -34,17 +34,12 @@ type Vacancy = {
   vacancyLocationDto: {
     id: number;
     name: string;
-    address: string;
-    phoneNumber: string;
-    email: string;
     logoUrl?: string | null;
-    totalEmployees: number;
   };
   category: {
     id: number;
     name: string;
   };
-  vacancyStatus?: boolean;
 };
 
 type FormOptions = {
@@ -68,8 +63,6 @@ export default function Home() {
     jobModes: [],
     companyDto: [],
   });
-
-  const [appliedVacancies, setAppliedVacancies] = useState<number[]>([]);
 
   const [selectedCompanyId, setSelectedCompanyId] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
@@ -109,30 +102,6 @@ export default function Home() {
       }
     };
     fetchFormOptions();
-  }, []);
-
-  /** Fetch applied vacancies on mount and persist after login **/
-  useEffect(() => {
-    const fetchAppliedVacancies = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
-      try {
-        const res = await fetch(`${API_APPLY}/api/applications`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch applied vacancies");
-
-        const data = await res.json();
-        const appliedIds = data.map((app: any) => app.vacancyId);
-        setAppliedVacancies(appliedIds);
-      } catch (err) {
-        console.error("Error fetching applied vacancies:", err);
-      }
-    };
-    fetchAppliedVacancies();
   }, []);
 
   /** Fetch vacancies when filters, search term, or page changes **/
@@ -192,43 +161,6 @@ export default function Home() {
     currentPage,
   ]);
 
-  /** Apply to a vacancy **/
-  const applyToVacancy = async (vacancyId: number) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      alert("Zəhmət olmasa əvvəlcə daxil olun.");
-      return;
-    }
-
-    if (appliedVacancies.includes(vacancyId)) {
-      alert("Siz artıq bu vakansiyaya müraciət etmisiniz.");
-      return;
-    }
-
-    try {
-      const res = await fetch(
-        `${API_APPLY}/api/applications?vacancyId=${vacancyId}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!res.ok) throw new Error("Müraciət uğursuz oldu");
-
-      try {
-        await res.json();
-      } catch {}
-
-      alert("Uğurla müraciət etdiniz!");
-      setAppliedVacancies((prev) => [...prev, vacancyId]);
-    } catch (err) {
-      console.error(err);
-      alert("Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.");
-    }
-  };
-
   return (
     <div className={styles.Home}>
       {/* Header */}
@@ -280,7 +212,6 @@ export default function Home() {
       {/* Filters */}
       <div className={styles.Filter}>
         <div className={styles.FilterList}>
-          {/* Company */}
           <div className={styles.FilterItem}>
             <label>Şirkət</label>
             <div className={styles.SelectWrapper}>
@@ -302,7 +233,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Category */}
           <div className={styles.FilterItem}>
             <label>Kateqoriya</label>
             <div className={styles.SelectWrapper}>
@@ -324,7 +254,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Employment Type */}
           <div className={styles.FilterItem}>
             <label>İş növləri</label>
             <div className={styles.SelectWrapper}>
@@ -346,7 +275,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Job Mode */}
           <div className={styles.FilterItem}>
             <label>İş imkanları</label>
             <div className={styles.SelectWrapper}>
@@ -386,52 +314,33 @@ export default function Home() {
               : "Heç bir vakansiya tapılmadı."}
           </p>
         ) : (
-          vacancies.map((vacancy) => {
-            const hasApplied = appliedVacancies.includes(vacancy.id);
-            return (
-              <div
-                key={vacancy.id}
-                className={styles.VacancyListItems}
-                onClick={() => navigate(`/vacancy/${vacancy.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <div className={styles.LogoInfo}>
-                  <img
-                    src={
-                      vacancy.vacancyLocationDto?.logoUrl
-                        ? vacancy.vacancyLocationDto.logoUrl
-                        : "src/website/assets/default_logo.png"
-                    }
-                    alt={vacancy.vacancyLocationDto?.name || "Company Logo"}
-                    className={styles.VacancyLogo}
-                  />
-                  <div className={styles.VacancyInfo}>
-                    <h3>{vacancy.position}</h3>
-                    <p>
-                      {vacancy.vacancyLocationDto?.name || "Naməlum Şirkət"}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className={styles.Applylink}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!hasApplied) applyToVacancy(vacancy.id);
-                  }}
-                >
-                  <div
-                    className={styles.ApplyBtn}
-                    style={{
-                      backgroundColor: hasApplied ? "#ccc" : "#407bff",
-                      cursor: hasApplied ? "not-allowed" : "pointer",
-                    }}
-                  >
-                    <h4>{hasApplied ? "Müraciət olunub" : "Müraciət et"}</h4>
-                  </div>
+          vacancies.map((vacancy) => (
+            <div key={vacancy.id} className={styles.VacancyListItems}>
+              <div className={styles.LogoInfo}>
+                <img
+                  src={
+                    vacancy.vacancyLocationDto?.logoUrl ||
+                    "src/website/assets/default_logo.png"
+                  }
+                  alt={vacancy.vacancyLocationDto?.name || "Company Logo"}
+                  className={styles.VacancyLogo}
+                />
+                <div className={styles.VacancyInfo}>
+                  <h3>{vacancy.position}</h3>
+                  <p>{vacancy.vacancyLocationDto?.name || "Naməlum Şirkət"}</p>
                 </div>
               </div>
-            );
-          })
+              <div className={styles.Applylink}>
+                <div
+                  className={styles.ApplyBtn}
+                  style={{ backgroundColor: "#407bff" }}
+                  onClick={() => navigate(`/vacancy/${vacancy.id}`)}
+                >
+                  <h4>Ətraflı bax</h4>
+                </div>
+              </div>
+            </div>
+          ))
         )}
       </div>
 

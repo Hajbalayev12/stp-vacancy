@@ -117,7 +117,7 @@ export default function Signup() {
       password: formData.password,
       confirmPassword: formData.confirm_password,
       phone: "994" + formData.phone,
-      seriaNumber: formData.id_prefix + formData.id_number,
+      serialNumber: formData.id_prefix + formData.id_number,
       cv: [],
     };
 

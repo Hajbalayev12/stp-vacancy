@@ -20,9 +20,11 @@ const Navbar = () => {
     i18n.changeLanguage(e.target.value);
   };
 
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
-    window.dispatchEvent(new Event("loginStatusChanged")); // notify change
+    localStorage.removeItem("accessToken"); // remove token
+    window.dispatchEvent(new Event("loginStatusChanged")); // notify other components
     setMenuOpen(false);
     navigate("/");
   };
@@ -73,8 +75,6 @@ const Navbar = () => {
             <img src="/src/website/assets/Logo.png" alt="Logo" />
           </NavLink>
         </div>
-
-        {/* Top-right Auth Buttons (Desktop view) */}
 
         {/* Main Navigation Links */}
         <ul className={`${styles.navLinks} ${menuOpen ? styles.show : ""}`}>
@@ -161,16 +161,15 @@ const Navbar = () => {
           </div>
         </ul>
 
+        {/* Auth Buttons */}
         <div className={styles.NavButtons}>
           {!isLoggedIn ? (
             <>
               <NavLink to="/signin" className={styles.Signin}>
-                <FaSignInAlt />
-                {t("Daxil ol")}
+                <FaSignInAlt /> {t("Daxil ol")}
               </NavLink>
               <NavLink to="/signup" className={styles.Signup}>
-                <FaUserPlus />
-                {t("Qeydiyyat")}
+                <FaUserPlus /> {t("Qeydiyyat")}
               </NavLink>
             </>
           ) : (
