@@ -163,11 +163,6 @@
           height: auto;
           object-fit: contain;
           margin-right: 1vw;
-          transition: transform 0.3s ease;
-
-          &:hover {
-            transform: rotate(8deg) scale(1.1);
-          }
         }
 
         .VacancyInfo {
@@ -186,28 +181,32 @@
         }
       }
 
-      .ApplyBtn {
-        background-color: #407bff;
-        color: white;
-        font-size: 1.1vw;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        padding: 0.6vw 1.2vw;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.3s ease,
-          font-size 0.3s ease;
-        position: relative;
+      .Applylink {
         z-index: 1;
         text-decoration: none;
-      }
-      .Applylink {
-        all: unset;
-        cursor: pointer;
-        text-decoration: none;
-        color: inherit;
-        display: inline-block;
+
+        .ApplyBtn {
+          padding: 0.8rem 1.8rem;
+          background: linear-gradient(135deg, #4c6fff, #2d49c9);
+          color: white;
+          border-radius: 14px;
+          font-size: 1.05rem;
+          font-weight: 500;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 6px 16px rgba(44, 90, 255, 0.3);
+
+          h4 {
+            margin: 0;
+          }
+
+          &:hover {
+            background: linear-gradient(135deg, #2d49c9, #4c6fff);
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(44, 90, 255, 0.4);
+          }
+        }
       }
     }
 

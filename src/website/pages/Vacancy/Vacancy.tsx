@@ -29,12 +29,12 @@ type Vacancy = {
   salaryNegotiable: boolean;
   minSalary: number;
   maxSalary: number;
-  companyDto?: {
-    companyName: string;
-    companyAddress: string;
-    companyPhoneNumber: string;
-    companyEmail: string;
-    companyLogoUrl: string;
+  vacancyOrganizationDto?: {
+    name: string;
+    address: string;
+    phoneNumber: string;
+    email: string;
+    logoUrl: string;
     totalEmployees: number;
   };
   employmentType?: { id: number; name: string };
@@ -152,7 +152,7 @@ const VacancyInfo = () => {
             <div className={styles.logo}>
               <img
                 src={
-                  vacancy.companyDto?.companyLogoUrl ||
+                  vacancy.vacancyOrganizationDto?.logoUrl ||
                   "src/website/assets/default_logo.png"
                 }
                 alt="Company logo"
@@ -165,7 +165,7 @@ const VacancyInfo = () => {
               </p>
               <p className={styles.meta}>
                 <FaMapMarkerAlt />{" "}
-                {vacancy.companyDto?.companyName || "Naməlum şirkət"}
+                {vacancy.vacancyOrganizationDto?.name || "Naməlum şirkət"}
               </p>
               <p className={styles.date}>
                 Elanın yerləşdirilmə tarixi: {vacancy.createdDate}

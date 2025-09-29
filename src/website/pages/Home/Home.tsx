@@ -31,7 +31,7 @@ const StyledPagination = styled(Pagination)(() => ({
 type Vacancy = {
   id: number;
   position: string;
-  vacancyLocationDto: {
+  vacancyOrganizationDto: {
     id: number;
     name: string;
     logoUrl?: string | null;
@@ -319,15 +319,17 @@ export default function Home() {
               <div className={styles.LogoInfo}>
                 <img
                   src={
-                    vacancy.vacancyLocationDto?.logoUrl ||
+                    vacancy.vacancyOrganizationDto?.logoUrl ||
                     "src/website/assets/default_logo.png"
                   }
-                  alt={vacancy.vacancyLocationDto?.name || "Company Logo"}
+                  alt={vacancy.vacancyOrganizationDto?.name || "Company Logo"}
                   className={styles.VacancyLogo}
                 />
                 <div className={styles.VacancyInfo}>
                   <h3>{vacancy.position}</h3>
-                  <p>{vacancy.vacancyLocationDto?.name || "Naməlum Şirkət"}</p>
+                  <p>
+                    {vacancy.vacancyOrganizationDto?.name || "Naməlum Şirkət"}
+                  </p>
                 </div>
               </div>
               <div className={styles.Applylink}>

@@ -4,8 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
-import { API_COMPANIES } from "../../../constants/apiBase";
-import { API_VACANCIES } from "../../../constants/apiBase";
+import { API_COMPANIES, API_VACANCIES } from "../../../constants/apiBase";
 
 const StyledPagination = styled(Pagination)(() => ({
   "& .MuiPaginationItem-root": {
@@ -51,7 +50,11 @@ interface CompanyData {
 interface Vacancy {
   id: number;
   position: string;
-  companyDto: {
+  vacancyOrganizationDto?: {
+    name: string;
+    logoUrl: string;
+  };
+  companyDto?: {
     companyName: string;
     companyLogoUrl: string;
   };
@@ -89,11 +92,11 @@ export default function Company() {
 
   const size = 3;
 
+  // Fetch company data
   useEffect(() => {
     if (!id) return;
 
-    // Şirkət məlumatı
-    fetch(`${API_COMPANIES}/api/companies/${id}`)
+    fetch(`${API_COMPANIES}/api/organizations/company/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Məlumat alınmadı");
         return res.json();
@@ -105,6 +108,7 @@ export default function Company() {
       });
   }, [id]);
 
+  // Fetch company vacancies
   useEffect(() => {
     if (!id) return;
 
@@ -136,16 +140,16 @@ export default function Company() {
   return (
     <div className={styles.Company}>
       <div className={styles.companyCard}>
+        {/* Company Header */}
         <div className={styles.header}>
           <img
             className={styles.logo}
             src={
-              companyData.companyLogoUrl &&
-              companyData.companyLogoUrl !== "string"
-                ? companyData.companyLogoUrl
+              companyData.companyLogoUrl
+                ? getFullImageUrl(companyData.companyLogoUrl)
                 : "/assets/default_logo.png"
             }
-            alt="Company Logo"
+            alt={companyData.companyName || "Company Logo"}
           />
           <div>
             <h1>{companyData.companyName}</h1>
@@ -159,6 +163,7 @@ export default function Company() {
           </div>
         </div>
 
+        {/* Tabs */}
         <div className={styles.tabs}>
           <span
             className={activeTab === "vacancies" ? styles.active : ""}
@@ -174,40 +179,46 @@ export default function Company() {
           </span>
         </div>
 
+        {/* Vacancies Tab */}
         {activeTab === "vacancies" ? (
           <div className={styles.VacancyList}>
             {vacancies.length > 0 ? (
               <>
-                {vacancies.map((vacancy) => (
-                  <div key={vacancy.id} className={styles.VacancyListItems}>
-                    <div className={styles.LogoInfo}>
-                      <img
-                        src={getFullImageUrl(
-                          vacancy.companyDto?.companyLogoUrl
-                        )}
-                        alt={vacancy.companyDto?.companyName || "Company Logo"}
-                        className={styles.VacancyLogo}
-                      />
-                      <div className={styles.VacancyInfo}>
-                        <h3>{vacancy.position || "Vakansiya"}</h3>
-                        <p>
-                          {vacancy.companyDto?.companyName ||
-                            "The Power of Tomorrow"}
-                        </p>
-                      </div>
-                    </div>
-                    <Link
-                      to={`/vacancy/${vacancy.id}`}
-                      className={styles.Applylink}
-                    >
-                      <div className={styles.ApplyBtn}>
-                        <h4>Müraciət et</h4>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+                {vacancies.map((vacancy) => {
+                  const logoUrl =
+                    vacancy.vacancyOrganizationDto?.logoUrl ||
+                    vacancy.companyDto?.companyLogoUrl;
+                  const companyName =
+                    vacancy.vacancyOrganizationDto?.name ||
+                    vacancy.companyDto?.companyName ||
+                    "Company";
 
-                {/* MUI Pagination */}
+                  return (
+                    <div key={vacancy.id} className={styles.VacancyListItems}>
+                      <div className={styles.LogoInfo}>
+                        <img
+                          src={getFullImageUrl(logoUrl)}
+                          alt={companyName}
+                          className={styles.VacancyLogo}
+                        />
+                        <div className={styles.VacancyInfo}>
+                          <h3>{vacancy.position || "Vakansiya"}</h3>
+                          <p>{companyName}</p>
+                        </div>
+                      </div>
+                      <Link
+                        to={`/vacancy/${vacancy.id}`}
+                        className={styles.Applylink}
+                      >
+                        <div className={styles.ApplyBtn}>
+                          <h4>Ətraflı bax</h4>
+                        </div>
+                      </Link>
+                    </div>
+                  );
+                })}
+
+                {/* Pagination */}
                 <div className={styles.Pagination}>
                   <Stack spacing={2} alignItems="center">
                     <StyledPagination

@@ -11,16 +11,21 @@ interface Company {
   activeVacancyCount: number;
 }
 
+// Helper to handle logo URL
+const getLogoUrl = (url?: string) => {
+  if (!url) return "/assets/default_logo.png"; // fallback
+  if (url.startsWith("http") || url.startsWith("https")) return url;
+  return `${API_COMPANIES}/${url}`;
+};
+
 export default function Companies() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
-    fetch(`${API_COMPANIES}/api/companies/all/company`)
+    fetch(`${API_COMPANIES}/api/organizations/company/all`)
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
+        if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
       })
       .then((data) => {
@@ -41,13 +46,15 @@ export default function Companies() {
             <Link to={`/company/${company.id}`} key={company.id}>
               <div className={styles.CompanyItems}>
                 <img
-                  src={company.companyLogoUrl}
+                  src={getLogoUrl(company.companyLogoUrl)}
                   alt={company.companyName}
                   className={styles.CompanyLogo}
                 />
                 <h2>{company.companyName}</h2>
                 <p>{company.companyAddress}</p>
-                <button>Vakansiya sayı: {company.activeVacancyCount}</button>
+                <button>
+                  Vakansiya sayı: {company.activeVacancyCount || 0}
+                </button>
               </div>
             </Link>
           ))

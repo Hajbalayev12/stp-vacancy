@@ -29,6 +29,14 @@ export default function Sidebar() {
       ],
     },
     {
+      icon: <LuBuilding2 />,
+      label: "Projects",
+      subItems: [
+        { label: "➕ Add project", path: "/admin/addcompany" },
+        { label: "View projects", path: "/admin/viewcompanies" },
+      ],
+    },
+    {
       icon: <FaUsers />,
       label: t("accounts"),
       subItems: [{ label: t("users"), path: "/admin/users" }],

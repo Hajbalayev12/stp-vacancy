@@ -21,7 +21,7 @@ const Viewcompanies = () => {
     const fetchCompanies = async () => {
       try {
         const response = await fetch(
-          `${API_COMPANIES}/api/companies/all/company`
+          `${API_COMPANIES}/api/organizations/company/all`
         );
 
         if (!response.ok) {

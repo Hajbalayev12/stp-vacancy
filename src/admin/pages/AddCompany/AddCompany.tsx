@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AddCompany.module.scss";
 import { LuBuilding2 } from "react-icons/lu";
-import { useToast } from "../../../shared/context/ToastContext";
-import { API_COMPANIES } from "../../../constants/apiBase";
+import { API_COMPANIES, API_FILE } from "../../../constants/apiBase";
 
 export default function AddCompany() {
   const [companyName, setCompanyName] = useState("");
@@ -14,9 +13,7 @@ export default function AddCompany() {
   const [workerNumber, setWorkerNumber] = useState<number | "">("");
   const [logo, setLogo] = useState<File | null>(null);
 
-  const { showError, showSuccess } = useToast();
-
-  // Allowed image MIME types for logo
+  // ✅ Yalnız icazə verilən fayl tipləri
   const validImageTypes = [
     "image/jpeg",
     "image/jpg",
@@ -26,129 +23,141 @@ export default function AddCompany() {
     "image/webp",
   ];
 
-  // Logo input change handler with validation
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
       setLogo(null);
       return;
     }
-
     if (!validImageTypes.includes(file.type)) {
-      showError(
-        "Yalnız JPG, JPEG, PNG, SVG, GIF və WEBP formatlı şəkillər qəbul olunur."
+      alert(
+        "⚠️ Yalnız JPG, JPEG, PNG, SVG, GIF və WEBP formatlı şəkillər qəbul olunur."
       );
       e.target.value = "";
       setLogo(null);
       return;
     }
-
     setLogo(file);
   };
 
   const validateForm = (): boolean => {
     if (!companyName.trim()) {
-      showError("Şirkət adı boş ola bilməz");
+      alert("⚠️ Şirkət adı boş ola bilməz");
       return false;
     }
     if (companyName.length < 2 || companyName.length > 100) {
-      showError("Şirkət adı 2 ilə 100 simvol arasında olmalıdır");
+      alert("⚠️ Şirkət adı 2 ilə 100 simvol arasında olmalıdır");
       return false;
     }
     if (!location.trim()) {
-      showError("Konum boş ola bilməz");
+      alert("⚠️ Konum boş ola bilməz");
       return false;
     }
     if (!about.trim()) {
-      showError("Haqqında bölməsi boş ola bilməz");
+      alert("⚠️ Haqqında bölməsi boş ola bilməz");
       return false;
     }
     if (about.length > 500) {
-      showError("Haqqında maksimum 500 simvol ola bilər");
+      alert("⚠️ Haqqında maksimum 500 simvol ola bilər");
       return false;
     }
     if (!voen.trim()) {
-      showError("VÖEN boş ola bilməz");
+      alert("⚠️ VÖEN boş ola bilməz");
       return false;
     }
     if (voen.length < 6 || voen.length > 15) {
-      showError("VÖEN 6 ilə 15 simvol arasında olmalıdır");
+      alert("⚠️ VÖEN 6 ilə 15 simvol arasında olmalıdır");
       return false;
     }
     if (!gmail.trim()) {
-      showError("E-poçt ünvanı boş ola bilməz");
+      alert("⚠️ E-poçt ünvanı boş ola bilməz");
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(gmail)) {
-      showError("E-poçt ünvanı düzgün formatda deyil");
+      alert("⚠️ E-poçt ünvanı düzgün formatda deyil");
       return false;
     }
     if (!phone.trim()) {
-      showError("Telefon nömrəsi boş ola bilməz");
+      alert("⚠️ Telefon nömrəsi boş ola bilməz");
       return false;
     }
     if (!/^\+994(50|51|55|70|77)[0-9]{7}$/.test(phone)) {
-      showError(
-        "Telefon nömrəsi '+994' ilə başlayıb, 50, 51, 55, 70, 77 ilə davam etməli və ümumilikdə 13 rəqəm olmalıdır"
+      alert(
+        "⚠️ Telefon '+994' ilə başlayıb, 50, 51, 55, 70 və ya 77 ilə davam etməli və ümumilikdə 13 rəqəm olmalıdır"
       );
       return false;
     }
     if (workerNumber === "" || workerNumber === null) {
-      showError("İşçi sayı boş ola bilməz");
+      alert("⚠️ İşçi sayı boş ola bilməz");
       return false;
     }
-    if (workerNumber < 0) {
-      showError("İşçi sayı 0 və ya daha böyük olmalıdır");
+    if (Number(workerNumber) < 0) {
+      alert("⚠️ İşçi sayı 0 və ya daha böyük olmalıdır");
       return false;
     }
     if (!logo) {
-      showError("Loqo şəkli seçilməlidir");
+      alert("⚠️ Loqo şəkli seçilməlidir");
       return false;
     }
-
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
-    const confirmed = window.confirm(
-      "Bu şirkəti yaratmaq istədiyinizə əminsiniz?"
-    );
-    if (!confirmed) return;
-
-    const companyDto = {
-      companyName,
-      companyAddress: location,
-      companyPhoneNumber: phone,
-      companyEmail: gmail,
-      companyTin: voen,
-      companyDescription: about,
-      totalEmployees: Number(workerNumber),
-    };
-
-    const formData = new FormData();
-    formData.append("photo", logo!);
-
-    const companyBlob = new Blob([JSON.stringify(companyDto)], {
-      type: "application/json",
-    });
-    formData.append("companyDto", companyBlob);
+    if (!confirm(`"${companyName}" şirkətini əlavə etmək istədiyinizə əminsinizmi?`)) return;
 
     try {
-      const response = await fetch(
-        `${API_COMPANIES}/api/companies/add/company`,
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        alert("❌ Giriş etməmisiniz. Əvvəlcə login olun.");
+        return;
+      }
+
+      // 1️⃣ Şəkili yüklə
+      const fileForm = new FormData();
+      fileForm.append("file", logo!);
+
+      const fileResp = await fetch(`${API_FILE}/api/files/save-file`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fileForm,
+      });
+
+      const fileText = await fileResp.text();
+      if (!fileResp.ok) {
+        alert(`❌ Şəkil yüklənmədi: ${fileText}`);
+        return;
+      }
+      const photoUrl = fileText.trim();
+
+      // 2️⃣ Şirkət məlumatlarını göndər
+      const companyDto = {
+        companyName,
+        companyAddress: location,
+        companyPhoneNumber: phone,
+        companyEmail: gmail,
+        companyTin: voen,
+        companyDescription: about,
+        totalEmployees: Number(workerNumber),
+        companyLogoKey: photoUrl,
+      };
+
+      const companyResp = await fetch(
+        `${API_COMPANIES}/api/organizations/company/add`,
         {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(companyDto),
         }
       );
 
-      if (response.ok) {
-        showSuccess("Şirkət uğurla əlavə olundu!");
-
+      if (companyResp.ok) {
+        alert("✅ Şirkət uğurla əlavə olundu!");
         setCompanyName("");
         setLocation("");
         setPhone("");
@@ -158,11 +167,12 @@ export default function AddCompany() {
         setWorkerNumber("");
         setLogo(null);
       } else {
-        showError("Xəta baş verdi. Zəhmət olmasa yenidən yoxlayın.");
+        const errMsg = await companyResp.text();
+        alert(`❌ Şirkət əlavə edilərkən xəta: ${errMsg}`);
       }
-    } catch (error) {
-      console.error("Serverə göndərmə zamanı xəta:", error);
-      showError("Serverə qoşulmaq mümkün olmadı.");
+    } catch (err) {
+      console.error("Server xətası:", err);
+      alert("❌ Serverə qoşulmaq mümkün olmadı.");
     }
   };
 
@@ -171,34 +181,34 @@ export default function AddCompany() {
       <h2>
         <LuBuilding2 /> Şirkət Əlavə Et
       </h2>
-      <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <label>
           Şirkət Logosu:
           <input
             type="file"
             accept=".jpg,.jpeg,.png,.svg,.gif,.webp"
             onChange={handleLogoChange}
+            required
           />
         </label>
-
         <label>
           Şirkət Adı:
           <input
             type="text"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
+            required
           />
         </label>
-
         <label>
           Konum:
           <input
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            required
           />
         </label>
-
         <label>
           Şirkət Nömrəsi:
           <input
@@ -207,54 +217,48 @@ export default function AddCompany() {
             onChange={(e) => setPhone(e.target.value)}
             maxLength={13}
             placeholder="+994501234567"
+            required
           />
         </label>
-
         <label>
           Şirkət Gmail:
           <input
             type="email"
             value={gmail}
             onChange={(e) => setGmail(e.target.value)}
+            required
           />
         </label>
-
         <label>
           Şirkət VÖEN:
           <input
             type="text"
             value={voen}
             onChange={(e) => setVoen(e.target.value)}
+            required
           />
         </label>
-
         <label>
           Şirkət Haqqında:
           <textarea
             value={about}
             onChange={(e) => setAbout(e.target.value)}
             maxLength={500}
+            required
           />
         </label>
-
         <label>
           İşçi sayı:
           <input
             type="number"
             value={workerNumber}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === "") {
-                setWorkerNumber("");
-              } else {
-                const num = Number(val);
-                if (num >= 0) setWorkerNumber(num);
-              }
-            }}
+            onChange={(e) =>
+              setWorkerNumber(e.target.value ? Number(e.target.value) : "")
+            }
             min={0}
+            required
           />
         </label>
-
         <button type="submit">✅ Əlavə Et</button>
       </form>
     </div>

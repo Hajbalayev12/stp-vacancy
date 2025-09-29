@@ -38,6 +38,7 @@
     display: flex;
     flex-direction: column;
     min-width: 280px;
+    margin-bottom: 30px;
 
     label {
       font-weight: 500;
@@ -66,40 +67,9 @@
     }
   }
 
-  /* Company select container to separate from form fields */
-  > .field {
-    max-width: 400px;
-    margin-bottom: 20px;
-  }
-
-  /* Company info display below the select */
-  .companyInfo {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    // margin-bottom: 30px;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #f9faff;
-    max-width: 420px;
-
-    .companyLogo {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background-color: white;
-    }
-
-    h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #0073e6;
-      margin: 0;
-      white-space: nowrap;
-    }
+  /* Narrow Organization Type select */
+  > .field select[name="vacancyOrganizationTypeId"] {
+    max-width: 350px;
   }
 
   .submitBtn {
@@ -119,6 +89,8 @@
       background-color: #005bb5;
     }
   }
+
+  /* Company / Project select + preview wrapper */
   .companySelectWrapper {
     display: flex;
     align-items: center;
@@ -130,25 +102,33 @@
       flex-grow: 1;
     }
 
-    .companyInfo {
+    .companyInfo,
+    .projectInfo {
       display: flex;
       align-items: center;
       gap: 12px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #f9faff;
+      max-width: 420px;
 
-      .companyLogo {
+      .companyLogo,
+      .projectLogo {
         width: 50px;
         height: 50px;
         object-fit: contain;
         border-radius: 6px;
         border: 1px solid #ddd;
-        background: #fff;
+        background-color: #fff;
       }
 
       h3 {
         font-size: 18px;
+        font-weight: 600;
         color: #0073e6;
         margin: 0;
-        font-weight: 600;
+        white-space: nowrap;
       }
     }
   }

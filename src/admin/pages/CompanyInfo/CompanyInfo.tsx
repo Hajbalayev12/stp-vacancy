@@ -55,7 +55,7 @@ const CompanyInfo = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>("");
 
-  const API_BASE_URL = `${API_COMPANIES}/api/companies`;
+  const API_BASE_URL = `${API_COMPANIES}/api/organizations/company`;
   const { showError, showSuccess } = useToast();
 
   useEffect(() => {
@@ -274,7 +274,10 @@ const CompanyInfo = () => {
       const backendSuccess = data?.message || "Məlumatlar uğurla yeniləndi.";
       showSuccess(backendSuccess);
 
-      const refreshRes = await fetch(`${API_BASE_URL}/${id}`);
+      const refreshRes = await fetch(
+        `${API_BASE_URL}/api/organizations/company/${id}`
+      );
+
       if (!refreshRes.ok) {
         throw new Error("Yenilənmiş məlumatlar alınmadı.");
       }
